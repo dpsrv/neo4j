@@ -31,8 +31,12 @@ spec:
           envFrom:
             - configMapRef:
                 name: neo4j-env
-            - secretRef:
-                name: neo4j-auth
+          env:
+            - name: NEO4J_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-auth
+                  key: neo4j-auth
           volumeMounts:
             - name: neo4j-data
               mountPath: /data

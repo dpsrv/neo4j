@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Requires secret `neo4j-auth` in namespace `dpsrv` with key `NEO4J_AUTH` set to `neo4j/<password>`.
+Requires secret `neo4j-auth` in namespace `dpsrv` with key `neo4j-auth` set to `neo4j/<password>`.
 
 ## Deploy
 
