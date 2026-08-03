@@ -18,6 +18,20 @@ spec:
         app: neo4j
     spec:
       enableServiceLinks: false
+      initContainers:
+        - name: install-plugins
+          image: curlimages/curl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Installing n10s (neosemantics) plugin..."
+              curl -sL https://github.com/neo4j-labs/neosemantics/releases/download/5.24.1/neosemantics-5.24.1.jar \
+                -o /plugins/neosemantics-5.24.1.jar
+              echo "Plugin installed"
+          volumeMounts:
+            - name: neo4j-plugins
+              mountPath: /plugins
       containers:
         - name: neo4j
           image: neo4j:5-community
@@ -41,6 +55,8 @@ spec:
           volumeMounts:
             - name: neo4j-data
               mountPath: /data
+            - name: neo4j-plugins
+              mountPath: /var/lib/neo4j/plugins
           resources:
             requests:
               memory: "1Gi"
@@ -66,3 +82,5 @@ spec:
         - name: neo4j-data
           persistentVolumeClaim:
             claimName: neo4j-data
+        - name: neo4j-plugins
+          emptyDir: {}

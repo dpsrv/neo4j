@@ -82,10 +82,63 @@ bolt://neo4j.dpsrv.svc.cluster.local:7687
 http://neo4j.dpsrv.svc.cluster.local:7474
 ```
 
+## Wikidata Import
+
+Download the truthy dump from https://dumps.wikimedia.org/wikidatawiki/entities/ (latest-truthy.nt.gz).
+
+### Setup
+
+```bash
+# Create wikidata user (uses admin credentials from neo4j-auth secret)
+./bin/setup-wikidata-db.sh 'wikidata-password'
+
+# Create the secret for the wikidata user
+kubectl create secret generic neo4j-wikidata-auth -n dpsrv --from-literal=neo4j-wikidata-auth='wikidata/wikidata-password'
+```
+
+### Import
+
+```bash
+./bin/import-wikidata.sh ~/downloads/latest-truthy.nt.gz
+```
+
+### Example Queries
+
+```cypher
+// Find an entity by Wikidata ID (e.g., Q42 = Douglas Adams)
+MATCH (n:Resource {uri: 'http://www.wikidata.org/entity/Q42'})
+RETURN n;
+
+// Get all properties of an entity
+MATCH (n:Resource {uri: 'http://www.wikidata.org/entity/Q42'})-[r]->(m)
+RETURN type(r) AS property, m.uri AS value, m.value AS literal
+LIMIT 50;
+
+// Find entities by label (if imported)
+MATCH (n:Resource)
+WHERE n.`http://www.w3.org/2000/01/rdf-schema#label` CONTAINS 'Albert Einstein'
+RETURN n.uri, n.`http://www.w3.org/2000/01/rdf-schema#label`
+LIMIT 10;
+
+// Find all instances of a class (e.g., Q5 = human)
+MATCH (n:Resource)-[:ns0__P31]->(class:Resource {uri: 'http://www.wikidata.org/entity/Q5'})
+RETURN n.uri LIMIT 10;
+
+// Explore relationships between two entities
+MATCH path = (a:Resource {uri: 'http://www.wikidata.org/entity/Q42'})-[*1..2]-(b:Resource {uri: 'http://www.wikidata.org/entity/Q84'})
+RETURN path LIMIT 5;
+
+// Count entities
+MATCH (n:Resource) WHERE n.uri STARTS WITH 'http://www.wikidata.org/entity/Q'
+RETURN count(n) AS entities;
+```
+
 ## Configuration
 
 Memory settings in `k8s/01-neo4j-configmap.yaml`:
 - Heap: 512MB initial, 1GB max
 - Page cache: 512MB
 
-Adjust based on your data size and workload.
+Adjust based on your data size and workload. For Wikidata imports, increase significantly:
+- Heap: 4GB+
+- Page cache: 8GB+
