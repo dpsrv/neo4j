@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dpsrv
+  name: neo4j
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: neo4j
+  template:
+    metadata:
+      labels:
+        app: neo4j
+    spec:
+      containers:
+        - name: neo4j
+          image: neo4j:5-community
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 7474
+              protocol: TCP
+            - name: bolt
+              containerPort: 7687
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: neo4j-env
+            - secretRef:
+                name: neo4j-auth
+          volumeMounts:
+            - name: neo4j-data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 7474
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 7474
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: neo4j-data
+          persistentVolumeClaim:
+            claimName: neo4j-data
