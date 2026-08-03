@@ -4,6 +4,10 @@
 
 Requires secret `neo4j-auth` in namespace `dpsrv` with key `neo4j-auth` set to `neo4j/<password>`.
 
+```bash
+kubectl create secret generic neo4j-auth -n dpsrv --from-literal=neo4j-auth='neo4j/yourpassword'
+```
+
 ## Deploy
 
 ```bash
