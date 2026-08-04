@@ -8,11 +8,11 @@
  *   - English labels only
  *
  * Usage:
- *   # Pass 1: identify entities to keep
- *   bzcat latest-truthy.nt.bz2 | node filter-wikidata.js > /tmp/keep-entities.txt
+ *   # Pass 1: identify entities to keep (may have duplicates due to memory flushing)
+ *   bzcat latest-truthy.nt.bz2 | ./filter-wikidata.js | sort -u > /tmp/keep-entities.txt
  *
  *   # Pass 2: extract triples for those entities
- *   bzcat latest-truthy.nt.bz2 | node filter-wikidata.js --pass2 /tmp/keep-entities.txt > filtered.nt
+ *   bzcat latest-truthy.nt.bz2 | ./filter-wikidata.js --pass2 /tmp/keep-entities.txt > filtered.nt
  *
  *   # Compress for neo4j import
  *   gzip filtered.nt
@@ -84,13 +84,27 @@ async function pass1() {
         keepInstances.add(subj);
       }
     }
+
+    // Periodically flush to stdout to reduce memory pressure
+    if (lineCount % 50_000_000 === 0) {
+      for (const entity of classes) {
+        console.log(entity);
+      }
+      for (const entity of keepInstances) {
+        console.log(entity);
+      }
+      classes.clear();
+      keepInstances.clear();
+      process.stderr.write(`  Flushed to stdout, memory cleared\n`);
+    }
   }
 
-  const keepEntities = new Set([...classes, ...keepInstances]);
-  process.stderr.write(`Pass 1 complete: ${classes.size.toLocaleString()} classes, ${keepInstances.size.toLocaleString()} instances\n`);
-  process.stderr.write(`Total entities to keep: ${keepEntities.size.toLocaleString()}\n`);
+  process.stderr.write(`Pass 1 complete: ${classes.size.toLocaleString()} classes, ${keepInstances.size.toLocaleString()} instances remaining\n`);
 
-  for (const entity of keepEntities) {
+  for (const entity of classes) {
+    console.log(entity);
+  }
+  for (const entity of keepInstances) {
     console.log(entity);
   }
 }
