@@ -45,6 +45,16 @@ const KEEP_INSTANCE_TYPES = new Set([
   `<${WD}Q1288568>`,  // modern language
 ]);
 
+const startTime = Date.now();
+
+function elapsed() {
+  const secs = Math.floor((Date.now() - startTime) / 1000);
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return `${h}h${m.toString().padStart(2, '0')}m${s.toString().padStart(2, '0')}s`;
+}
+
 function parseTriple(line) {
   line = line.trim();
   if (!line || line.startsWith('#')) return null;
@@ -66,7 +76,7 @@ async function pass1() {
   for await (const line of rl) {
     lineCount++;
     if (lineCount % 10_000_000 === 0) {
-      process.stderr.write(`  Pass 1: ${lineCount.toLocaleString()} lines, ${classes.size.toLocaleString()} classes, ${keepInstances.size.toLocaleString()} instances\n`);
+      process.stderr.write(`  [${elapsed()}] Pass 1: ${lineCount.toLocaleString()} lines, ${classes.size.toLocaleString()} classes, ${keepInstances.size.toLocaleString()} instances\n`);
     }
 
     const triple = parseTriple(line);
@@ -95,11 +105,11 @@ async function pass1() {
       }
       classes.clear();
       keepInstances.clear();
-      process.stderr.write(`  Flushed to stdout, memory cleared\n`);
+      process.stderr.write(`  [${elapsed()}] Flushed to stdout, memory cleared\n`);
     }
   }
 
-  process.stderr.write(`Pass 1 complete: ${classes.size.toLocaleString()} classes, ${keepInstances.size.toLocaleString()} instances remaining\n`);
+  process.stderr.write(`[${elapsed()}] Pass 1 complete: ${classes.size.toLocaleString()} classes, ${keepInstances.size.toLocaleString()} instances remaining\n`);
 
   for (const entity of classes) {
     console.log(entity);
@@ -127,7 +137,7 @@ async function pass2(keepFile) {
   for await (const line of rl) {
     lineCount++;
     if (lineCount % 10_000_000 === 0) {
-      process.stderr.write(`  Pass 2: ${lineCount.toLocaleString()} lines, ${keptCount.toLocaleString()} kept\n`);
+      process.stderr.write(`  [${elapsed()}] Pass 2: ${lineCount.toLocaleString()} lines, ${keptCount.toLocaleString()} kept\n`);
     }
 
     const triple = parseTriple(line);
@@ -148,7 +158,7 @@ async function pass2(keepFile) {
     }
   }
 
-  process.stderr.write(`Pass 2 complete: ${keptCount.toLocaleString()} triples kept from ${lineCount.toLocaleString()}\n`);
+  process.stderr.write(`[${elapsed()}] Pass 2 complete: ${keptCount.toLocaleString()} triples kept from ${lineCount.toLocaleString()}\n`);
 }
 
 const args = process.argv.slice(2);
