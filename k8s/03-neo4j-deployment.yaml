@@ -26,8 +26,8 @@ spec:
             - -c
             - |
               echo "Installing n10s (neosemantics) plugin..."
-              curl -sL https://github.com/neo4j-labs/neosemantics/releases/download/5.24.1/neosemantics-5.24.1.jar \
-                -o /plugins/neosemantics-5.24.1.jar
+              curl -sL https://github.com/neo4j-labs/neosemantics/releases/download/5.26.0/neosemantics-5.26.0.jar \
+                -o /plugins/neosemantics-5.26.0.jar
               echo "Plugin installed"
           volumeMounts:
             - name: neo4j-plugins
