@@ -17,15 +17,11 @@ kubectl create secret generic neo4j-auth -n dpsrv --from-literal=neo4j-auth='neo
 ## Port Forward (localhost only)
 
 ```bash
-# Browser UI
-kubectl port-forward -n dpsrv svc/neo4j 7474:7474 --address 127.0.0.1
-
-# Bolt protocol (for drivers)
-kubectl port-forward -n dpsrv svc/neo4j 7687:7687 --address 127.0.0.1
-
-# Both at once
+# Both browser UI and Bolt protocol
 kubectl port-forward -n dpsrv svc/neo4j 7474:7474 7687:7687 --address 127.0.0.1
 ```
+
+Then open http://localhost:7474 in your browser.
 
 ## Usage
 
@@ -33,7 +29,11 @@ kubectl port-forward -n dpsrv svc/neo4j 7474:7474 7687:7687 --address 127.0.0.1
 
 Open http://localhost:7474 and login with:
 - Username: `neo4j`
-- Password: (from secret `neo4j-auth`)
+- Password: `kubectl get secret neo4j-auth -n dpsrv -o jsonpath='{.data.neo4j-auth}' | base64 -d | cut -d/ -f2`
+
+### Neo4j Desktop
+
+Download from https://neo4j.com/download/ - connect to `bolt://localhost:7687` with the same credentials.
 
 ### Cypher Shell
 

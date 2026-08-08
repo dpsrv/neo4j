@@ -62,21 +62,23 @@ function parseTriple(line) {
   return null;
 }
 
-function extractQid(uri) {
-  const match = uri.match(/entity\/(Q\d+)>/);
+function extractId(uri) {
+  // Match both Q-entities and P-properties
+  const match = uri.match(/entity\/([QP]\d+)>/);
   return match ? match[1] : null;
 }
 
-function entityPath(baseDir, qid) {
-  const prefix = qid.substring(0, 3);
-  return path.join(baseDir, prefix, qid);
+function entityPath(baseDir, id) {
+  // Q123 -> Q12/Q123, P31 -> P31/P31
+  const prefix = id.substring(0, 3);
+  return path.join(baseDir, prefix, id);
 }
 
 function markEntity(baseDir, uri) {
-  const qid = extractQid(uri);
-  if (!qid) return;
+  const id = extractId(uri);
+  if (!id) return;
 
-  const filePath = entityPath(baseDir, qid);
+  const filePath = entityPath(baseDir, id);
   const dir = path.dirname(filePath);
 
   if (!fs.existsSync(dir)) {
@@ -88,9 +90,15 @@ function markEntity(baseDir, uri) {
 }
 
 function hasEntity(baseDir, uri) {
-  const qid = extractQid(uri);
-  if (!qid) return false;
-  return fs.existsSync(entityPath(baseDir, qid));
+  const id = extractId(uri);
+  if (!id) return false;
+  return fs.existsSync(entityPath(baseDir, id));
+}
+
+function extractPropertyId(predicate) {
+  // <http://www.wikidata.org/prop/direct/P31> -> P31
+  const match = predicate.match(/prop\/direct\/(P\d+)>/);
+  return match ? match[1] : null;
 }
 
 function createReader(inputFile) {
@@ -131,16 +139,24 @@ async function main(inputFile, baseDir) {
     fs.mkdirSync(baseDir, { recursive: true });
   }
 
-  // Pass 1: build index
+  // Pass 1: build index of entities to keep
   process.stderr.write(`[${elapsed()}] Pass 1: Building entity index in ${baseDir}\n`);
   let classCount = 0;
   let instanceCount = 0;
+  let propertyCount = 0;
+  const propertiesToKeep = new Set();
 
   await processFile(inputFile, baseDir, 1, {
     status(lineCount) {
-      process.stderr.write(`  [${elapsed()}] ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances\n`);
+      process.stderr.write(`  [${elapsed()}] ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertiesToKeep.size.toLocaleString()} properties\n`);
     },
     process({ subj, pred, obj }) {
+      // Track properties used
+      const propId = extractPropertyId(pred);
+      if (propId) {
+        propertiesToKeep.add(propId);
+      }
+
       if (pred === P279) {
         markEntity(baseDir, subj);
         classCount++;
@@ -155,7 +171,19 @@ async function main(inputFile, baseDir) {
       }
     },
     done(lineCount) {
-      process.stderr.write(`[${elapsed()}] Pass 1 complete: ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances\n`);
+      // Mark all used properties for keeping
+      for (const propId of propertiesToKeep) {
+        const filePath = entityPath(baseDir, propId);
+        const dir = path.dirname(filePath);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        if (!fs.existsSync(filePath)) {
+          fs.writeFileSync(filePath, '');
+          propertyCount++;
+        }
+      }
+      process.stderr.write(`[${elapsed()}] Pass 1 complete: ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertyCount.toLocaleString()} properties\n`);
     }
   });
 
