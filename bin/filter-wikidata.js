@@ -43,12 +43,22 @@ const KEEP_INSTANCE_TYPES = new Set([
 
 const startTime = Date.now();
 
-function elapsed() {
-  const secs = Math.floor((Date.now() - startTime) / 1000);
+function formatDuration(secs) {
   const h = Math.floor(secs / 3600);
   const m = Math.floor((secs % 3600) / 60);
-  const s = secs % 60;
+  const s = Math.floor(secs % 60);
   return `${h}h${m.toString().padStart(2, '0')}m${s.toString().padStart(2, '0')}s`;
+}
+
+function elapsed() {
+  return formatDuration((Date.now() - startTime) / 1000);
+}
+
+function eta(pct) {
+  if (pct <= 0) return '?';
+  const elapsedSecs = (Date.now() - startTime) / 1000;
+  const remainingSecs = elapsedSecs * (100 - pct) / pct;
+  return formatDuration(remainingSecs);
 }
 
 function parseTriple(line) {
@@ -173,7 +183,7 @@ async function main(inputFile, baseDir) {
 
   await processFile(inputFile, baseDir, 1, {
     status(lineCount, pct) {
-      process.stderr.write(`  [${elapsed()}] ${pct}% ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertiesToKeep.size.toLocaleString()} properties\n`);
+      process.stderr.write(`  [${pct}% ${elapsed()}/${eta(pct)}] ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertiesToKeep.size.toLocaleString()} properties\n`);
     },
     process({ subj, pred, obj }) {
       // Track properties used
@@ -220,7 +230,7 @@ async function main(inputFile, baseDir) {
 
   await processFile(inputFile, baseDir, 2, {
     status(lineCount, pct) {
-      process.stderr.write(`  [${elapsed()}] ${pct}% ${lineCount.toLocaleString()} lines, ${keptCount.toLocaleString()} kept\n`);
+      process.stderr.write(`  [${pct}% ${elapsed()}/${eta(pct)}] ${lineCount.toLocaleString()} lines, ${keptCount.toLocaleString()} kept\n`);
     },
     process({ subj, pred, obj }, line) {
       if (hasEntity(baseDir, subj)) {
