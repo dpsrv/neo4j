@@ -101,28 +101,52 @@ function extractPropertyId(predicate) {
   return match ? match[1] : null;
 }
 
-function createReader(inputFile) {
+function createReader(inputFile, onProgress) {
   let stream;
+  const fileSize = fs.statSync(inputFile).size;
+
   if (inputFile.endsWith('.bz2')) {
-    const proc = spawn('bzcat', [inputFile]);
+    const fileStream = fs.createReadStream(inputFile);
+    let bytesRead = 0;
+    fileStream.on('data', chunk => {
+      bytesRead += chunk.length;
+      if (onProgress) onProgress(bytesRead, fileSize);
+    });
+    const proc = spawn('bzcat', ['-'], { stdio: ['pipe', 'pipe', 'inherit'] });
+    fileStream.pipe(proc.stdin);
     stream = proc.stdout;
   } else if (inputFile.endsWith('.gz')) {
-    const proc = spawn('zcat', [inputFile]);
+    const fileStream = fs.createReadStream(inputFile);
+    let bytesRead = 0;
+    fileStream.on('data', chunk => {
+      bytesRead += chunk.length;
+      if (onProgress) onProgress(bytesRead, fileSize);
+    });
+    const proc = spawn('zcat', ['-'], { stdio: ['pipe', 'pipe', 'inherit'] });
+    fileStream.pipe(proc.stdin);
     stream = proc.stdout;
   } else {
     stream = fs.createReadStream(inputFile);
+    let bytesRead = 0;
+    stream.on('data', chunk => {
+      bytesRead += chunk.length;
+      if (onProgress) onProgress(bytesRead, fileSize);
+    });
   }
   return readline.createInterface({ input: stream });
 }
 
 async function processFile(inputFile, baseDir, passNum, handler) {
-  const rl = createReader(inputFile);
+  let currentPct = 0;
+  const rl = createReader(inputFile, (bytesRead, totalBytes) => {
+    currentPct = Math.floor(100 * bytesRead / totalBytes);
+  });
   let lineCount = 0;
 
   for await (const line of rl) {
     lineCount++;
     if (lineCount % 10_000_000 === 0) {
-      handler.status(lineCount);
+      handler.status(lineCount, currentPct);
     }
 
     const triple = parseTriple(line);
@@ -144,11 +168,12 @@ async function main(inputFile, baseDir) {
   let classCount = 0;
   let instanceCount = 0;
   let propertyCount = 0;
+  let totalLines = 0;
   const propertiesToKeep = new Set();
 
   await processFile(inputFile, baseDir, 1, {
-    status(lineCount) {
-      process.stderr.write(`  [${elapsed()}] ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertiesToKeep.size.toLocaleString()} properties\n`);
+    status(lineCount, pct) {
+      process.stderr.write(`  [${elapsed()}] ${pct}% ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertiesToKeep.size.toLocaleString()} properties\n`);
     },
     process({ subj, pred, obj }) {
       // Track properties used
@@ -183,6 +208,8 @@ async function main(inputFile, baseDir) {
           propertyCount++;
         }
       }
+      // Save for pass 2 percentage
+      totalLines = lineCount;
       process.stderr.write(`[${elapsed()}] Pass 1 complete: ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertyCount.toLocaleString()} properties\n`);
     }
   });
@@ -192,8 +219,8 @@ async function main(inputFile, baseDir) {
   let keptCount = 0;
 
   await processFile(inputFile, baseDir, 2, {
-    status(lineCount) {
-      process.stderr.write(`  [${elapsed()}] ${lineCount.toLocaleString()} lines, ${keptCount.toLocaleString()} kept\n`);
+    status(lineCount, pct) {
+      process.stderr.write(`  [${elapsed()}] ${pct}% ${lineCount.toLocaleString()} lines, ${keptCount.toLocaleString()} kept\n`);
     },
     process({ subj, pred, obj }, line) {
       if (hasEntity(baseDir, subj)) {
