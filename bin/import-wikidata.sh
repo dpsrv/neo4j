@@ -41,7 +41,7 @@ kubectl cp "$DUMP_FILE" "dpsrv/$POD:/var/lib/neo4j/import/truthy.nt.gz"
 log "Copy complete"
 
 log "Importing RDF (this will take a while)"
-cypher "CALL n10s.rdf.import.fetch('file:///var/lib/neo4j/import/truthy.nt.gz', 'N-Triples', { commitSize: 25000 });"
+cypher "CALL n10s.rdf.import.fetch('file:///var/lib/neo4j/import/truthy.nt.gz', 'N-Triples', { commitSize: 25000, verifyUriSyntax: false });"
 
 log "Import complete"
 cypher "MATCH (n) RETURN count(n) AS nodes;"
