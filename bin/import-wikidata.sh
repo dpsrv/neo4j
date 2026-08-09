@@ -46,4 +46,7 @@ cypher "CALL n10s.rdf.import.fetch('file:///var/lib/neo4j/import/truthy.nt.gz', 
 log "Import complete"
 cypher "MATCH (n) RETURN count(n) AS nodes;"
 
+log "Cleaning up pod"
+kubectl exec -n dpsrv deploy/neo4j -- rm -f /var/lib/neo4j/import/truthy.nt.gz
+
 log "Done"
