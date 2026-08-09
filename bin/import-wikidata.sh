@@ -8,6 +8,21 @@ if [ ! -f "$DUMP_FILE" ]; then
   exit 1
 fi
 
+START_TIME=$(date +%s)
+
+elapsed() {
+  local now=$(date +%s)
+  local secs=$((now - START_TIME))
+  local h=$((secs / 3600))
+  local m=$(( (secs % 3600) / 60 ))
+  local s=$((secs % 60))
+  printf "%dh%02dm%02ds" $h $m $s
+}
+
+log() {
+  echo "[$(elapsed)] $1"
+}
+
 NEO4J_AUTH=$(kubectl get secret neo4j-wikidata-auth -n dpsrv -o jsonpath='{.data.neo4j-wikidata-auth}' | base64 -d)
 NEO4J_USER="${NEO4J_AUTH%%/*}"
 NEO4J_PASSWORD="${NEO4J_AUTH#*/}"
@@ -16,16 +31,19 @@ cypher() {
   echo "$1" | kubectl exec -i -n dpsrv deploy/neo4j -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
 }
 
-echo "=== Setting up n10s (neosemantics) ==="
+log "Setting up n10s (neosemantics)"
 cypher "CREATE CONSTRAINT n10s_unique_uri IF NOT EXISTS FOR (r:Resource) REQUIRE r.uri IS UNIQUE;"
 cypher "CALL n10s.graphconfig.init({ handleVocabUris: 'MAP', handleMultival: 'ARRAY', keepLangTag: false, keepCustomDataTypes: false });"
 
-echo "=== Copying dump file to pod ==="
+log "Copying dump file to pod ($(du -h "$DUMP_FILE" | cut -f1))"
 POD=$(kubectl get pod -n dpsrv -l app=neo4j -o jsonpath='{.items[0].metadata.name}')
 kubectl cp "$DUMP_FILE" "dpsrv/$POD:/var/lib/neo4j/import/truthy.nt.gz"
+log "Copy complete"
 
-echo "=== Importing RDF (this will take a while) ==="
+log "Importing RDF (this will take a while)"
 cypher "CALL n10s.rdf.import.fetch('file:///var/lib/neo4j/import/truthy.nt.gz', 'N-Triples', { commitSize: 25000 });"
 
-echo "=== Done ==="
+log "Import complete"
 cypher "MATCH (n) RETURN count(n) AS nodes;"
+
+log "Done"
