@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-DUMP_FILE="${1:?Usage: $0 <path-to-truthy.nt.gz>}"
+ENV="${1:?Usage: $0 <env> <path-to-truthy.nt.gz>}"
+DUMP_FILE="${2:?Usage: $0 <env> <path-to-truthy.nt.gz>}"
 
 if [ ! -f "$DUMP_FILE" ]; then
   echo "File not found: $DUMP_FILE"
@@ -23,20 +24,20 @@ log() {
   echo "[$(elapsed)] $1"
 }
 
-NEO4J_AUTH=$(kubectl get secret neo4j-wikidata-auth -n dpsrv -o jsonpath='{.data.neo4j-wikidata-auth}' | base64 -d)
+NEO4J_AUTH=$(kubectl get secret neo4j-${ENV}-wikidata-auth -n dpsrv -o jsonpath="{.data.neo4j-${ENV}-wikidata-auth}" | base64 -d)
 NEO4J_USER="${NEO4J_AUTH%%/*}"
 NEO4J_PASSWORD="${NEO4J_AUTH#*/}"
 
 cypher() {
-  echo "$1" | kubectl exec -i -n dpsrv deploy/neo4j -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
+  echo "$1" | kubectl exec -i -n dpsrv deploy/neo4j-${ENV} -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
 }
 
-log "Setting up n10s (neosemantics)"
+log "Setting up n10s (neosemantics) on neo4j-${ENV}"
 cypher "CREATE CONSTRAINT n10s_unique_uri IF NOT EXISTS FOR (r:Resource) REQUIRE r.uri IS UNIQUE;"
 cypher "CALL n10s.graphconfig.init({ handleVocabUris: 'MAP', handleMultival: 'ARRAY', keepLangTag: false, keepCustomDataTypes: false });"
 
 log "Copying dump file to pod ($(du -h "$DUMP_FILE" | cut -f1))"
-POD=$(kubectl get pod -n dpsrv -l app=neo4j -o jsonpath='{.items[0].metadata.name}')
+POD=$(kubectl get pod -n dpsrv -l app=neo4j-${ENV} -o jsonpath='{.items[0].metadata.name}')
 kubectl cp "$DUMP_FILE" "dpsrv/$POD:/var/lib/neo4j/import/truthy.nt.gz"
 log "Copy complete"
 
@@ -47,6 +48,6 @@ log "Import complete"
 cypher "MATCH (n) RETURN count(n) AS nodes;"
 
 log "Cleaning up pod"
-kubectl exec -n dpsrv deploy/neo4j -- rm -f /var/lib/neo4j/import/truthy.nt.gz
+kubectl exec -n dpsrv deploy/neo4j-${ENV} -- rm -f /var/lib/neo4j/import/truthy.nt.gz
 
 log "Done"

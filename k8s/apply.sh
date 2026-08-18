@@ -2,5 +2,5 @@
 
 SWD=$(dirname $0)
 for yaml in $SWD/*.yaml; do
-	cat $yaml | envsubst | kubectl apply -f -
+	kubectl apply -f $yaml
 done

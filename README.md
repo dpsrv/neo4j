@@ -2,26 +2,40 @@
 
 ## Prerequisites
 
-Requires secret `neo4j-auth` in namespace `dpsrv` with key `neo4j-auth` set to `neo4j/<password>`.
+Requires secret `neo4j-<env>-auth` in namespace `dpsrv` with key `neo4j-<env>-auth` set to `neo4j/<password>`.
 
 ```bash
-kubectl create secret generic neo4j-auth -n dpsrv --from-literal=neo4j-auth='neo4j/yourpassword'
+# For prod (default)
+kubectl create secret generic neo4j-prod-auth -n dpsrv --from-literal=neo4j-prod-auth='neo4j/yourpassword'
+
+# For dev
+kubectl create secret generic neo4j-dev-auth -n dpsrv --from-literal=neo4j-dev-auth='neo4j/yourpassword'
 ```
 
 ## Deploy
 
 ```bash
+# Deploy prod (default)
 ./k8s/apply.sh
+
+# Deploy dev
+NEO4J_ENV=dev ./k8s/apply.sh
+
+# Deploy both
+./k8s/apply.sh && NEO4J_ENV=dev ./k8s/apply.sh
 ```
 
 ## Port Forward (localhost only)
 
 ```bash
-# Both browser UI and Bolt protocol
-kubectl port-forward -n dpsrv svc/neo4j 7474:7474 7687:7687 --address 127.0.0.1
+# Prod
+kubectl port-forward -n dpsrv svc/neo4j-prod 7474:7474 7687:7687 --address 127.0.0.1
+
+# Dev (use different local ports)
+kubectl port-forward -n dpsrv svc/neo4j-dev 17474:7474 17687:7687 --address 127.0.0.1
 ```
 
-Then open http://localhost:7474 in your browser.
+Then open http://localhost:7474 (prod) or http://localhost:17474 (dev) in your browser.
 
 ## Usage
 
@@ -29,7 +43,7 @@ Then open http://localhost:7474 in your browser.
 
 Open http://localhost:7474 and login with:
 - Username: `neo4j`
-- Password: `kubectl get secret neo4j-auth -n dpsrv -o jsonpath='{.data.neo4j-auth}' | base64 -d | cut -d/ -f2`
+- Password: `kubectl get secret neo4j-prod-auth -n dpsrv -o jsonpath='{.data.neo4j-prod-auth}' | base64 -d | cut -d/ -f2`
 
 ### Neo4j Desktop
 
@@ -78,8 +92,13 @@ console.log(result.records[0].get('count').toNumber());
 ## In-cluster access
 
 ```
-bolt://neo4j.dpsrv.svc.cluster.local:7687
-http://neo4j.dpsrv.svc.cluster.local:7474
+# Prod
+bolt://neo4j-prod.dpsrv.svc.cluster.local:7687
+http://neo4j-prod.dpsrv.svc.cluster.local:7474
+
+# Dev
+bolt://neo4j-dev.dpsrv.svc.cluster.local:7687
+http://neo4j-dev.dpsrv.svc.cluster.local:7474
 ```
 
 ## Wikidata Import

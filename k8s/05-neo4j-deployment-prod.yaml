@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: dpsrv
-  name: neo4j
+  name: neo4j-prod
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
@@ -11,11 +11,11 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: neo4j
+      app: neo4j-prod
   template:
     metadata:
       labels:
-        app: neo4j
+        app: neo4j-prod
     spec:
       enableServiceLinks: false
       initContainers:
@@ -45,13 +45,13 @@ spec:
               protocol: TCP
           envFrom:
             - configMapRef:
-                name: neo4j-env
+                name: neo4j-prod-env
           env:
             - name: NEO4J_AUTH
               valueFrom:
                 secretKeyRef:
-                  name: neo4j-auth
-                  key: neo4j-auth
+                  name: neo4j-prod-auth
+                  key: neo4j-prod-auth
           volumeMounts:
             - name: neo4j-data
               mountPath: /data
@@ -81,6 +81,6 @@ spec:
       volumes:
         - name: neo4j-data
           persistentVolumeClaim:
-            claimName: neo4j-data
+            claimName: neo4j-prod-data
         - name: neo4j-plugins
           emptyDir: {}

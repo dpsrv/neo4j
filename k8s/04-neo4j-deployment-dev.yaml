@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: dpsrv
+  name: neo4j-dev
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: neo4j-dev
+  template:
+    metadata:
+      labels:
+        app: neo4j-dev
+    spec:
+      enableServiceLinks: false
+      initContainers:
+        - name: install-plugins
+          image: curlimages/curl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Installing n10s (neosemantics) plugin..."
+              curl -sL https://github.com/neo4j-labs/neosemantics/releases/download/5.26.0/neosemantics-5.26.0.jar \
+                -o /plugins/neosemantics-5.26.0.jar
+              echo "Plugin installed"
+          volumeMounts:
+            - name: neo4j-plugins
+              mountPath: /plugins
+      containers:
+        - name: neo4j
+          image: neo4j:5-community
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 7474
+              protocol: TCP
+            - name: bolt
+              containerPort: 7687
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: neo4j-dev-env
+          env:
+            - name: NEO4J_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-dev-auth
+                  key: neo4j-dev-auth
+          volumeMounts:
+            - name: neo4j-data
+              mountPath: /data
+            - name: neo4j-plugins
+              mountPath: /var/lib/neo4j/plugins
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 7474
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 7474
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: neo4j-data
+          persistentVolumeClaim:
+            claimName: neo4j-dev-data
+        - name: neo4j-plugins
+          emptyDir: {}
