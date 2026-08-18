@@ -4,12 +4,12 @@ set -e
 ENV="${1:?Usage: $0 <env> (dev|prod)}"
 
 # Get admin credentials
-NEO4J_AUTH=$(kubectl get secret neo4j-${ENV}-auth -n dpsrv -o jsonpath="{.data.neo4j-${ENV}-auth}" | base64 -d)
+NEO4J_AUTH=$(kubectl get secret neo4j-auth-${ENV} -n dpsrv -o jsonpath="{.data.neo4j-auth-${ENV}}" | base64 -d)
 NEO4J_USER="${NEO4J_AUTH%%/*}"
 NEO4J_PASSWORD="${NEO4J_AUTH#*/}"
 
 # Get wikidata credentials
-WIKIDATA_AUTH=$(kubectl get secret neo4j-${ENV}-wikidata-auth -n dpsrv -o jsonpath="{.data.neo4j-${ENV}-wikidata-auth}" | base64 -d)
+WIKIDATA_AUTH=$(kubectl get secret neo4j-wikidata-auth-${ENV} -n dpsrv -o jsonpath="{.data.neo4j-wikidata-auth-${ENV}}" | base64 -d)
 WIKIDATA_USER="${WIKIDATA_AUTH%%/*}"
 WIKIDATA_PASSWORD="${WIKIDATA_AUTH#*/}"
 

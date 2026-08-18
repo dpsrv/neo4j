@@ -50,8 +50,8 @@ spec:
             - name: NEO4J_AUTH
               valueFrom:
                 secretKeyRef:
-                  name: neo4j-dev-auth
-                  key: neo4j-dev-auth
+                  name: neo4j-auth-dev
+                  key: neo4j-auth-dev
           volumeMounts:
             - name: neo4j-data
               mountPath: /data

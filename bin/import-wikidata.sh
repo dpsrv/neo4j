@@ -24,7 +24,7 @@ log() {
   echo "[$(elapsed)] $1"
 }
 
-NEO4J_AUTH=$(kubectl get secret neo4j-${ENV}-wikidata-auth -n dpsrv -o jsonpath="{.data.neo4j-${ENV}-wikidata-auth}" | base64 -d)
+NEO4J_AUTH=$(kubectl get secret neo4j-wikidata-auth-${ENV} -n dpsrv -o jsonpath="{.data.neo4j-wikidata-auth-${ENV}}" | base64 -d)
 NEO4J_USER="${NEO4J_AUTH%%/*}"
 NEO4J_PASSWORD="${NEO4J_AUTH#*/}"
 
