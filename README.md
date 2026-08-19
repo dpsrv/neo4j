@@ -2,27 +2,22 @@
 
 ## Prerequisites
 
-Requires secret `neo4j-<env>-auth` in namespace `dpsrv` with key `neo4j-<env>-auth` set to `neo4j/<password>`.
+Create secrets for each environment:
 
 ```bash
-# For prod (default)
-kubectl create secret generic neo4j-prod-auth -n dpsrv --from-literal=neo4j-prod-auth='neo4j/yourpassword'
+# Admin credentials (format: neo4j/<password>)
+kubectl create secret generic neo4j-auth-dev -n dpsrv --from-literal=neo4j-auth-dev='neo4j/yourpassword'
+kubectl create secret generic neo4j-auth-prod -n dpsrv --from-literal=neo4j-auth-prod='neo4j/yourpassword'
 
-# For dev
-kubectl create secret generic neo4j-dev-auth -n dpsrv --from-literal=neo4j-dev-auth='neo4j/yourpassword'
+# Wikidata user credentials (format: wikidata/<password>)
+kubectl create secret generic neo4j-wikidata-auth-dev -n dpsrv --from-literal=neo4j-wikidata-auth-dev='wikidata/yourpassword'
+kubectl create secret generic neo4j-wikidata-auth-prod -n dpsrv --from-literal=neo4j-wikidata-auth-prod='wikidata/yourpassword'
 ```
 
 ## Deploy
 
 ```bash
-# Deploy prod (default)
 ./k8s/apply.sh
-
-# Deploy dev
-NEO4J_ENV=dev ./k8s/apply.sh
-
-# Deploy both
-./k8s/apply.sh && NEO4J_ENV=dev ./k8s/apply.sh
 ```
 
 ## Port Forward (localhost only)
@@ -52,11 +47,12 @@ Download from https://neo4j.com/download/ - connect to `bolt://localhost:7687` w
 ### Cypher Shell
 
 ```bash
-# Interactive shell
-./bin/cypher-shell.sh
+# Interactive shell (first arg is env: dev or prod)
+./bin/cypher-shell.sh dev
+./bin/cypher-shell.sh prod
 
 # Run a query
-./bin/cypher-shell.sh "MATCH (n) RETURN count(n);"
+./bin/cypher-shell.sh dev "MATCH (n) RETURN count(n);"
 ```
 
 ### Python
@@ -108,17 +104,34 @@ Download the truthy dump from https://dumps.wikimedia.org/wikidatawiki/entities/
 ### Setup
 
 ```bash
-# Create wikidata user (uses admin credentials from neo4j-auth secret)
-./bin/setup-wikidata-db.sh 'wikidata-password'
+# Create wikidata user (uses credentials from neo4j-wikidata-auth-<env> secret)
+./bin/setup-wikidata-db.sh dev
+./bin/setup-wikidata-db.sh prod
+```
 
-# Create the secret for the wikidata user
-kubectl create secret generic neo4j-wikidata-auth -n dpsrv --from-literal=neo4j-wikidata-auth='wikidata/wikidata-password'
+### Filter (optional)
+
+Filter the dump to extract only relevant triples (classes, geography, languages):
+
+```bash
+./bin/filter-wikidata.js ~/downloads/latest-truthy.nt ~/downloads/filtered-truthy.nt
 ```
 
 ### Import
 
 ```bash
-./bin/import-wikidata.sh ~/downloads/latest-truthy.nt.gz
+# First arg is env, second is path to .nt.gz file
+./bin/import-wikidata.sh dev ~/downloads/filtered-truthy.nt.gz
+./bin/import-wikidata.sh prod ~/downloads/filtered-truthy.nt.gz
+```
+
+### Property Labels
+
+Fetch human-readable labels for property predicates:
+
+```bash
+./bin/import-property-labels.js dev
+./bin/import-property-labels.js prod
 ```
 
 ### Example Queries

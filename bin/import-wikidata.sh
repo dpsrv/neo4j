@@ -36,10 +36,15 @@ log "Setting up n10s (neosemantics) on neo4j-${ENV}"
 cypher "CREATE CONSTRAINT n10s_unique_uri IF NOT EXISTS FOR (r:Resource) REQUIRE r.uri IS UNIQUE;"
 cypher "CALL n10s.graphconfig.init({ handleVocabUris: 'MAP', handleMultival: 'ARRAY', keepLangTag: false, keepCustomDataTypes: false });"
 
-log "Copying dump file to pod ($(du -h "$DUMP_FILE" | cut -f1))"
 POD=$(kubectl get pod -n dpsrv -l app=neo4j-${ENV} -o jsonpath='{.items[0].metadata.name}')
-kubectl cp "$DUMP_FILE" "dpsrv/$POD:/var/lib/neo4j/import/truthy.nt.gz"
-log "Copy complete"
+
+if kubectl exec -n dpsrv "$POD" -- test -f /var/lib/neo4j/import/truthy.nt.gz 2>/dev/null; then
+  log "Dump file already exists on pod, skipping copy"
+else
+  log "Copying dump file to pod ($(du -h "$DUMP_FILE" | cut -f1))"
+  kubectl cp "$DUMP_FILE" "dpsrv/$POD:/var/lib/neo4j/import/truthy.nt.gz"
+  log "Copy complete"
+fi
 
 log "Importing RDF (this will take a while)"
 cypher "CALL n10s.rdf.import.fetch('file:///var/lib/neo4j/import/truthy.nt.gz', 'N-Triples', { commitSize: 25000, verifyUriSyntax: false });"
