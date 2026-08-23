@@ -32,7 +32,9 @@ cypher() {
   echo "$1" | kubectl exec -i -n dpsrv deploy/neo4j-${ENV} -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
 }
 
-log "Setting up n10s (neosemantics) on neo4j-${ENV}"
+log "Clearing existing data and setting up n10s (neosemantics) on neo4j-${ENV}"
+cypher "MATCH (n) DETACH DELETE n;" || true
+cypher "CALL n10s.graphconfig.drop();" || true
 cypher "CREATE CONSTRAINT n10s_unique_uri IF NOT EXISTS FOR (r:Resource) REQUIRE r.uri IS UNIQUE;"
 cypher "CALL n10s.graphconfig.init({ handleVocabUris: 'MAP', handleMultival: 'ARRAY', keepLangTag: true, keepCustomDataTypes: false });"
 
