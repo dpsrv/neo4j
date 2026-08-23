@@ -33,22 +33,34 @@ cypher() {
 }
 
 log "Clearing existing data on neo4j-${ENV} (this may take a while)"
+
+get_count() {
+  cypher "MATCH (n) RETURN count(n) as c;" 2>&1 | grep -v "^c$" | grep -v "Defaulted" | tr -d ' ' | grep -E '^[0-9]+$' | head -1
+}
+
 # Get initial count
-INITIAL=$(cypher "MATCH (n) RETURN count(n) as c;" 2>/dev/null | grep -E '^[0-9]+$' | head -1)
-log "  Total nodes to delete: $INITIAL"
-BATCH=0
-# Delete in batches to avoid heap space issues
-while true; do
-  BATCH=$((BATCH + 1))
-  cypher "CALL { MATCH (n) WITH n LIMIT 50000 DETACH DELETE n } IN TRANSACTIONS OF 10000 ROWS RETURN 'done';" >/dev/null 2>&1
-  REMAINING=$(cypher "MATCH (n) RETURN count(n) as c;" 2>/dev/null | grep -E '^[0-9]+$' | head -1)
-  DELETED=$((INITIAL - REMAINING))
-  PCT=$((DELETED * 100 / INITIAL))
-  log "  Batch $BATCH: $DELETED/$INITIAL deleted ($PCT%) - $REMAINING remaining"
-  if [ "$REMAINING" = "0" ] || [ -z "$REMAINING" ]; then
-    break
-  fi
-done
+INITIAL=$(get_count)
+if [ -z "$INITIAL" ] || [ "$INITIAL" = "0" ]; then
+  log "  Database is empty"
+else
+  log "  Total nodes to delete: $INITIAL"
+  BATCH=0
+  # Delete in batches to avoid heap space issues
+  while true; do
+    BATCH=$((BATCH + 1))
+    cypher "CALL { MATCH (n) WITH n LIMIT 50000 DETACH DELETE n } IN TRANSACTIONS OF 10000 ROWS RETURN 'done';" >/dev/null 2>&1
+    REMAINING=$(get_count)
+    REMAINING=${REMAINING:-0}
+    if [ "$INITIAL" -gt 0 ]; then
+      DELETED=$((INITIAL - REMAINING))
+      PCT=$((DELETED * 100 / INITIAL))
+      log "  Batch $BATCH: $DELETED/$INITIAL deleted ($PCT%) - $REMAINING remaining"
+    fi
+    if [ "$REMAINING" = "0" ]; then
+      break
+    fi
+  done
+fi
 log "Setting up n10s (neosemantics)"
 cypher "CALL n10s.graphconfig.drop();" || true
 cypher "CREATE CONSTRAINT n10s_unique_uri IF NOT EXISTS FOR (r:Resource) REQUIRE r.uri IS UNIQUE;"
