@@ -33,11 +33,18 @@ cypher() {
 }
 
 log "Clearing existing data on neo4j-${ENV} (this may take a while)"
+# Get initial count
+INITIAL=$(cypher "MATCH (n) RETURN count(n) as c;" 2>/dev/null | grep -E '^[0-9]+$' | head -1)
+log "  Total nodes to delete: $INITIAL"
+BATCH=0
 # Delete in batches to avoid heap space issues
 while true; do
-  OUTPUT=$(cypher "CALL { MATCH (n) WITH n LIMIT 50000 DETACH DELETE n } IN TRANSACTIONS OF 10000 ROWS RETURN 'done';" 2>&1)
+  BATCH=$((BATCH + 1))
+  cypher "CALL { MATCH (n) WITH n LIMIT 50000 DETACH DELETE n } IN TRANSACTIONS OF 10000 ROWS RETURN 'done';" >/dev/null 2>&1
   REMAINING=$(cypher "MATCH (n) RETURN count(n) as c;" 2>/dev/null | grep -E '^[0-9]+$' | head -1)
-  log "  Remaining nodes: $REMAINING"
+  DELETED=$((INITIAL - REMAINING))
+  PCT=$((DELETED * 100 / INITIAL))
+  log "  Batch $BATCH: $DELETED/$INITIAL deleted ($PCT%) - $REMAINING remaining"
   if [ "$REMAINING" = "0" ] || [ -z "$REMAINING" ]; then
     break
   fi
