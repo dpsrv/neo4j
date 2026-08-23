@@ -32,8 +32,16 @@ cypher() {
   echo "$1" | kubectl exec -i -n dpsrv deploy/neo4j-${ENV} -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
 }
 
-log "Clearing existing data and setting up n10s (neosemantics) on neo4j-${ENV}"
-cypher "MATCH (n) DETACH DELETE n;" || true
+log "Clearing existing data on neo4j-${ENV} (this may take a while)"
+# Delete in batches to avoid heap space issues
+while true; do
+  DELETED=$(cypher "MATCH (n) WITH n LIMIT 50000 DETACH DELETE n RETURN count(*) as deleted;" 2>/dev/null | tail -1 | tr -d ' ')
+  log "  Deleted batch: $DELETED nodes"
+  if [ "$DELETED" = "0" ] || [ -z "$DELETED" ]; then
+    break
+  fi
+done
+log "Setting up n10s (neosemantics)"
 cypher "CALL n10s.graphconfig.drop();" || true
 cypher "CREATE CONSTRAINT n10s_unique_uri IF NOT EXISTS FOR (r:Resource) REQUIRE r.uri IS UNIQUE;"
 cypher "CALL n10s.graphconfig.init({ handleVocabUris: 'MAP', handleMultival: 'ARRAY', keepLangTag: true, keepCustomDataTypes: false });"
