@@ -9,6 +9,8 @@ NEO4J_PASSWORD="${NEO4J_AUTH#*/}"
 
 if [ -n "$1" ]; then
   echo "$1" | kubectl exec -i -n dpsrv deploy/neo4j-${ENV} -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
-else
+elif [ -t 0 ]; then
   kubectl exec -it -n dpsrv deploy/neo4j-${ENV} -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
+else
+  kubectl exec -i -n dpsrv deploy/neo4j-${ENV} -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
 fi
