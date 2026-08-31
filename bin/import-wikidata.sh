@@ -76,13 +76,40 @@ else
   log "Copy complete"
 fi
 
-log "Importing RDF (this will take a while)"
-cypher "CALL n10s.rdf.import.fetch('file:///var/lib/neo4j/import/truthy.nt.gz', 'N-Triples', { commitSize: 25000, verifyUriSyntax: false });"
+log "Starting RDF import in background (survives connection drops)"
+IMPORT_SCRIPT="/tmp/import-$$.sh"
+kubectl exec -n dpsrv "$POD" -- bash -c "cat > $IMPORT_SCRIPT" <<EOF
+#!/bin/bash
+echo "Import started at \$(date)" > /tmp/import.log
+cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" <<'CYPHER'
+CALL n10s.rdf.import.fetch('file:///var/lib/neo4j/import/truthy.nt.gz', 'N-Triples', { commitSize: 25000, verifyUriSyntax: false });
+CYPHER
+echo "Import finished at \$(date)" >> /tmp/import.log
+EOF
+kubectl exec -n dpsrv "$POD" -- chmod +x "$IMPORT_SCRIPT"
+kubectl exec -n dpsrv "$POD" -- bash -c "nohup $IMPORT_SCRIPT >> /tmp/import.log 2>&1 &"
 
-log "Import complete"
-cypher "MATCH (n) RETURN count(n) AS nodes;"
+log "Import running in background on pod. Polling progress..."
+LAST_COUNT=0
+while true; do
+  sleep 30
+  COUNT=$(get_count 2>/dev/null || echo "0")
+  COUNT=${COUNT:-0}
+
+  # Check if import finished
+  if kubectl exec -n dpsrv "$POD" -- grep -q "Import finished" /tmp/import.log 2>/dev/null; then
+    log "Import complete: $COUNT nodes"
+    break
+  fi
+
+  # Show progress if count changed
+  if [ "$COUNT" != "$LAST_COUNT" ]; then
+    log "Progress: $COUNT nodes"
+    LAST_COUNT=$COUNT
+  fi
+done
 
 log "Cleaning up pod"
-kubectl exec -n dpsrv deploy/neo4j-${ENV} -- rm -f /var/lib/neo4j/import/truthy.nt.gz
+kubectl exec -n dpsrv "$POD" -- rm -f /var/lib/neo4j/import/truthy.nt.gz "$IMPORT_SCRIPT" /tmp/import.log
 
 log "Done"
