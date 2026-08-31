@@ -28,11 +28,14 @@ NEO4J_AUTH=$(kubectl get secret neo4j-wikidata-auth-${ENV} -n dpsrv -o jsonpath=
 NEO4J_USER="${NEO4J_AUTH%%/*}"
 NEO4J_PASSWORD="${NEO4J_AUTH#*/}"
 
-cypher() {
-  echo "$1" | kubectl exec -i -n dpsrv deploy/neo4j-${ENV} -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
-}
-
 POD=$(kubectl get pod -n dpsrv -l app=neo4j-${ENV} -o jsonpath='{.items[0].metadata.name}')
+
+log "Waiting for neo4j-${ENV} to be ready..."
+kubectl wait --for=condition=Ready pod/"$POD" -n dpsrv --timeout=120s
+
+cypher() {
+  kubectl exec -n dpsrv "$POD" -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" "$1"
+}
 
 get_count() {
   kubectl exec -n dpsrv "$POD" -- cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" "MATCH (n) RETURN count(n) as c;" 2>&1 | grep -v "^c$" | grep -v "Defaulted" | tr -d ' ' | grep -E '^[0-9]+$' | head -1
