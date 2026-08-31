@@ -18,6 +18,8 @@ spec:
         app: neo4j-dev
     spec:
       enableServiceLinks: false
+      nodeSelector:
+        kubernetes.io/hostname: cnt-use1-2
       initContainers:
         - name: install-plugins
           image: curlimages/curl:latest
