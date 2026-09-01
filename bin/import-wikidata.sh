@@ -112,6 +112,7 @@ kubectl exec -n dpsrv "$POD" -- bash -c "echo '$IMPORT_B64' | base64 -d > /tmp/i
 kubectl exec -n dpsrv "$POD" -- bash -c "nohup /tmp/import.sh >> /tmp/import.log 2>&1 &"
 
 log "Import running in background on pod. Polling progress..."
+IMPORT_START=$(date +%s)
 LAST_COUNT=0
 while true; do
   sleep 30
@@ -120,13 +121,25 @@ while true; do
 
   # Check if import finished
   if kubectl exec -n dpsrv "$POD" -- grep -q "Import finished" /tmp/import.log 2>/dev/null; then
-    log "Import complete: $COUNT nodes"
+    ELAPSED_MIN=$(( ($(date +%s) - IMPORT_START) / 60 ))
+    if [ "$ELAPSED_MIN" -gt 0 ]; then
+      SPEED=$((COUNT / ELAPSED_MIN))
+      log "Import complete: $COUNT nodes ($SPEED nodes/min)"
+    else
+      log "Import complete: $COUNT nodes"
+    fi
     break
   fi
 
   # Show progress if count changed
   if [ "$COUNT" != "$LAST_COUNT" ]; then
-    log "Progress: $COUNT nodes"
+    ELAPSED_MIN=$(( ($(date +%s) - IMPORT_START) / 60 ))
+    if [ "$ELAPSED_MIN" -gt 0 ]; then
+      SPEED=$((COUNT / ELAPSED_MIN))
+      log "Progress: $COUNT nodes ($SPEED nodes/min)"
+    else
+      log "Progress: $COUNT nodes"
+    fi
     LAST_COUNT=$COUNT
   fi
 done
