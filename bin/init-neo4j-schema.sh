@@ -26,14 +26,21 @@ CREATE FULLTEXT INDEX trait_search IF NOT EXISTS
 FOR (n:Item) ON EACH [n.prefLabel]
 OPTIONS { indexConfig: { `fulltext.analyzer`: 'standard-no-stop-words' } };
 
-// Label items that are targets of P31 (instance_of) as Category for fast category lookups
-MATCH (item:Item)-[:P31]->(category:Item)
-WHERE NOT category:Category
-SET category:Category;
+// Label items that are targets of P31 (instance_of) as Category and compute item count
+CALL {
+  MATCH (item:Item)-[:P31]->(category:Item)
+  WITH category, count(item) as cnt
+  SET category:Category, category.itemCount = cnt
+  RETURN count(category) as labeled
+}
+RETURN labeled;
 
-// Index for Category label lookup
+// Indexes for Category lookups
 CREATE INDEX category_uri IF NOT EXISTS
 FOR (c:Category) ON (c.uri);
+
+CREATE INDEX category_item_count IF NOT EXISTS
+FOR (c:Category) ON (c.itemCount);
 
 // Show created indexes
 SHOW INDEXES;
