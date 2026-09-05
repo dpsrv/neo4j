@@ -44,8 +44,16 @@ echo "Found $URI_COUNT URIs in whitelist"
 # Build comma-separated list for Cypher
 URI_LIST=$(echo "$URIS" | sed "s/^/'/;s/$/'/" | tr '\n' ',' | sed 's/,$//')
 
-# Run the update query
+# Run the update query - first disable all, then enable whitelist
 $CYPHER_SHELL $ENV <<EOF
+// Disable all categories first
+MATCH (c:Category)
+WHERE c.enabled = true
+SET c.enabled = false;
+EOF
+
+$CYPHER_SHELL $ENV <<EOF
+// Enable only whitelisted categories
 MATCH (c:Category)
 WHERE c.uri IN [$URI_LIST]
 SET c.enabled = true
