@@ -1,0 +1,197 @@
+#!/bin/bash
+
+# Enable curated categories for dating profile traits
+# Run this after label-categories.sh to pre-populate useful categories
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Load environment
+if [ -f "$SCRIPT_DIR/../.env" ]; then
+    source "$SCRIPT_DIR/../.env"
+fi
+
+NEO4J_HOST="${NEO4J_HOST:-localhost}"
+NEO4J_BOLT_PORT="${NEO4J_BOLT_PORT:-7687}"
+NEO4J_USER="${NEO4J_USER:-neo4j}"
+NEO4J_PASSWORD="${NEO4J_PASSWORD:-neo4j}"
+
+echo "Enabling curated categories for dating profiles..."
+echo "Host: $NEO4J_HOST:$NEO4J_BOLT_PORT"
+
+# Curated list of Wikidata category URIs relevant to dating profiles
+# Format: URI|Description (description is for documentation only)
+CATEGORIES=(
+    # Hobbies & Activities
+    "http://www.wikidata.org/entity/Q47728|hobby"
+    "http://www.wikidata.org/entity/Q1914636|activity"
+    "http://www.wikidata.org/entity/Q2707257|outdoor recreation"
+    "http://www.wikidata.org/entity/Q21573587|indoor activity"
+    "http://www.wikidata.org/entity/Q17537576|creative work"
+
+    # Sports
+    "http://www.wikidata.org/entity/Q349|sport"
+    "http://www.wikidata.org/entity/Q216048|team sport"
+    "http://www.wikidata.org/entity/Q2083958|individual sport"
+    "http://www.wikidata.org/entity/Q61065|water sport"
+    "http://www.wikidata.org/entity/Q204686|winter sport"
+    "http://www.wikidata.org/entity/Q11417|martial art"
+    "http://www.wikidata.org/entity/Q31629|type of sport"
+    "http://www.wikidata.org/entity/Q4438121|sports discipline"
+    "http://www.wikidata.org/entity/Q212434|racquet sport"
+    "http://www.wikidata.org/entity/Q5372|basketball"
+    "http://www.wikidata.org/entity/Q2736|association football"
+
+    # Music
+    "http://www.wikidata.org/entity/Q188451|music genre"
+    "http://www.wikidata.org/entity/Q34379|musical instrument"
+    "http://www.wikidata.org/entity/Q27939|singing"
+    "http://www.wikidata.org/entity/Q638|music"
+
+    # Entertainment & Games
+    "http://www.wikidata.org/entity/Q201658|film genre"
+    "http://www.wikidata.org/entity/Q659563|video game genre"
+    "http://www.wikidata.org/entity/Q15961987|television genre"
+    "http://www.wikidata.org/entity/Q131436|board game"
+    "http://www.wikidata.org/entity/Q142714|card game"
+    "http://www.wikidata.org/entity/Q11410|game"
+    "http://www.wikidata.org/entity/Q7889|video game"
+    "http://www.wikidata.org/entity/Q2393187|tabletop game"
+    "http://www.wikidata.org/entity/Q1150958|role-playing game"
+
+    # Food & Drink
+    "http://www.wikidata.org/entity/Q2095|food"
+    "http://www.wikidata.org/entity/Q1778821|cuisine"
+    "http://www.wikidata.org/entity/Q40050|drink"
+    "http://www.wikidata.org/entity/Q134768|cocktail"
+    "http://www.wikidata.org/entity/Q44|beer"
+    "http://www.wikidata.org/entity/Q282|wine"
+    "http://www.wikidata.org/entity/Q13276|tea"
+    "http://www.wikidata.org/entity/Q8851|coffee"
+    "http://www.wikidata.org/entity/Q746549|dish"
+    "http://www.wikidata.org/entity/Q80228|dessert"
+
+    # Professions & Occupations
+    "http://www.wikidata.org/entity/Q28640|profession"
+    "http://www.wikidata.org/entity/Q12737077|occupation"
+    "http://www.wikidata.org/entity/Q4164871|position"
+
+    # Arts & Creativity
+    "http://www.wikidata.org/entity/Q1792379|art form"
+    "http://www.wikidata.org/entity/Q36649|visual art"
+    "http://www.wikidata.org/entity/Q184485|performing art"
+    "http://www.wikidata.org/entity/Q11639|dance"
+    "http://www.wikidata.org/entity/Q11629|art movement"
+    "http://www.wikidata.org/entity/Q1027879|painting technique"
+    "http://www.wikidata.org/entity/Q860861|sculpture"
+    "http://www.wikidata.org/entity/Q11060274|print"
+    "http://www.wikidata.org/entity/Q4502142|visual artwork"
+    "http://www.wikidata.org/entity/Q735|art"
+    "http://www.wikidata.org/entity/Q11030|photography"
+
+    # Literature & Writing
+    "http://www.wikidata.org/entity/Q223393|literary genre"
+    "http://www.wikidata.org/entity/Q571|book"
+    "http://www.wikidata.org/entity/Q482|poetry"
+    "http://www.wikidata.org/entity/Q8261|novel"
+
+    # Travel & Places
+    "http://www.wikidata.org/entity/Q1200957|type of tourist destination"
+    "http://www.wikidata.org/entity/Q56247866|type of tourist attraction"
+    "http://www.wikidata.org/entity/Q515|city"
+    "http://www.wikidata.org/entity/Q6256|country"
+
+    # Pets & Animals
+    "http://www.wikidata.org/entity/Q39201|pet"
+    "http://www.wikidata.org/entity/Q39367|dog breed"
+    "http://www.wikidata.org/entity/Q43577|cat breed"
+    "http://www.wikidata.org/entity/Q152|fish"
+    "http://www.wikidata.org/entity/Q5113|bird"
+
+    # Languages
+    "http://www.wikidata.org/entity/Q34770|language"
+    "http://www.wikidata.org/entity/Q33742|natural language"
+    "http://www.wikidata.org/entity/Q1288568|modern language"
+
+    # Education & Knowledge
+    "http://www.wikidata.org/entity/Q11862829|academic discipline"
+    "http://www.wikidata.org/entity/Q336|science"
+    "http://www.wikidata.org/entity/Q21198|computer science"
+    "http://www.wikidata.org/entity/Q395|mathematics"
+    "http://www.wikidata.org/entity/Q413|physics"
+    "http://www.wikidata.org/entity/Q420|biology"
+    "http://www.wikidata.org/entity/Q2329|chemistry"
+    "http://www.wikidata.org/entity/Q8134|economics"
+    "http://www.wikidata.org/entity/Q5891|philosophy"
+    "http://www.wikidata.org/entity/Q9418|psychology"
+    "http://www.wikidata.org/entity/Q21201|sociology"
+    "http://www.wikidata.org/entity/Q309|history"
+
+    # Lifestyle & Wellness
+    "http://www.wikidata.org/entity/Q32090|lifestyle"
+    "http://www.wikidata.org/entity/Q309252|physical exercise"
+    "http://www.wikidata.org/entity/Q179057|yoga"
+    "http://www.wikidata.org/entity/Q40953|meditation"
+    "http://www.wikidata.org/entity/Q11404|vegetarianism"
+    "http://www.wikidata.org/entity/Q181138|veganism"
+
+    # Religion & Spirituality
+    "http://www.wikidata.org/entity/Q9174|religion"
+    "http://www.wikidata.org/entity/Q1841|Catholicism"
+    "http://www.wikidata.org/entity/Q5043|Christianity"
+    "http://www.wikidata.org/entity/Q432|Islam"
+    "http://www.wikidata.org/entity/Q9268|Judaism"
+    "http://www.wikidata.org/entity/Q748|Buddhism"
+    "http://www.wikidata.org/entity/Q9089|Hinduism"
+    "http://www.wikidata.org/entity/Q106039|agnosticism"
+    "http://www.wikidata.org/entity/Q7066|atheism"
+
+    # Personality & Values
+    "http://www.wikidata.org/entity/Q3277269|personality trait"
+    "http://www.wikidata.org/entity/Q15211908|human behavior"
+    "http://www.wikidata.org/entity/Q169872|virtue"
+
+    # Collecting & Interests
+    "http://www.wikidata.org/entity/Q208165|collecting"
+    "http://www.wikidata.org/entity/Q22687|bank card"
+    "http://www.wikidata.org/entity/Q175173|philately"
+    "http://www.wikidata.org/entity/Q180898|numismatics"
+
+    # Nature & Outdoors
+    "http://www.wikidata.org/entity/Q1072353|hiking"
+    "http://www.wikidata.org/entity/Q3196|camping"
+    "http://www.wikidata.org/entity/Q34095|mountaineering"
+    "http://www.wikidata.org/entity/Q1395645|gardening"
+    "http://www.wikidata.org/entity/Q14373|fishing"
+
+    # Technology
+    "http://www.wikidata.org/entity/Q9143|programming language"
+    "http://www.wikidata.org/entity/Q7397|software"
+    "http://www.wikidata.org/entity/Q68|computer"
+)
+
+# Build the Cypher query with all URIs
+URIS=""
+for entry in "${CATEGORIES[@]}"; do
+    URI="${entry%%|*}"
+    if [ -n "$URIS" ]; then
+        URIS="$URIS, "
+    fi
+    URIS="$URIS'$URI'"
+done
+
+# Run the update query
+cypher-shell -a "bolt://$NEO4J_HOST:$NEO4J_BOLT_PORT" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" <<EOF
+// Enable curated categories
+MATCH (c:Category)
+WHERE c.uri IN [$URIS]
+SET c.enabled = true
+RETURN count(c) as enabled_count;
+EOF
+
+echo ""
+echo "Done! Enabled categories matching the curated whitelist."
+echo ""
+echo "To verify:"
+echo "  MATCH (c:Category {enabled: true}) RETURN count(c);"
