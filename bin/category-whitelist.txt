@@ -51,11 +51,6 @@ http://www.wikidata.org/entity/Q11629      # art movement
 # Literature & Writing
 http://www.wikidata.org/entity/Q223393     # literary genre
 
-# Pets & Animals
-http://www.wikidata.org/entity/Q39201      # pet
-http://www.wikidata.org/entity/Q39367      # dog breed
-http://www.wikidata.org/entity/Q43577      # cat breed
-
 # Languages
 http://www.wikidata.org/entity/Q34770      # language
 http://www.wikidata.org/entity/Q33742      # natural language
