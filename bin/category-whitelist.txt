@@ -1,74 +1,46 @@
-# Curated categories for dating profiles
-# These are CATEGORIES (P31 targets), not individual traits
-# One URI per line, comments start with #
+# Custom dating profile categories
+# These are created by setup-custom-categories.sh
+# This file is for reference / manual use with enable-categories.sh
 
-# Hobbies & Activities
-http://www.wikidata.org/entity/Q47728      # hobby
-http://www.wikidata.org/entity/Q1914636    # activity
-http://www.wikidata.org/entity/Q2707257    # outdoor recreation
-http://www.wikidata.org/entity/Q21573587   # indoor activity
+# Interests & Activities
+dating:category:pets
+dating:category:outdoor-activities
+dating:category:indoor-activities
+dating:category:sports
+dating:category:fitness
+dating:category:music
+dating:category:food-drink
+dating:category:entertainment
+dating:category:creative
+dating:category:travel
 
-# Sports
-http://www.wikidata.org/entity/Q349        # sport
-http://www.wikidata.org/entity/Q216048     # team sport
-http://www.wikidata.org/entity/Q2083958    # individual sport
-http://www.wikidata.org/entity/Q61065      # water sport
-http://www.wikidata.org/entity/Q204686     # winter sport
-http://www.wikidata.org/entity/Q11417      # martial art
-http://www.wikidata.org/entity/Q212434     # racquet sport
-http://www.wikidata.org/entity/Q4438121    # sports discipline
+# Personal
+dating:category:social
+dating:category:values
+dating:category:lifestyle
+dating:category:languages
 
-# Music
-http://www.wikidata.org/entity/Q188451     # music genre
-http://www.wikidata.org/entity/Q34379      # musical instrument
+# Professional
+dating:category:career
+dating:category:education
 
-# Entertainment & Games
-http://www.wikidata.org/entity/Q201658     # film genre
-http://www.wikidata.org/entity/Q659563     # video game genre
-http://www.wikidata.org/entity/Q15961987   # television genre
-http://www.wikidata.org/entity/Q131436     # board game
-http://www.wikidata.org/entity/Q142714     # card game
-http://www.wikidata.org/entity/Q2393187    # tabletop game
+# Demographics
+dating:category:height
+dating:category:weight
+dating:category:hair-color
+dating:category:eye-color
+dating:category:body-type
+dating:category:ethnicity
+dating:category:gender
+dating:category:orientation
 
-# Food & Drink
-http://www.wikidata.org/entity/Q2095       # food
-http://www.wikidata.org/entity/Q1778821    # cuisine
-http://www.wikidata.org/entity/Q40050      # drink
-http://www.wikidata.org/entity/Q134768     # cocktail
-http://www.wikidata.org/entity/Q746549     # dish
-http://www.wikidata.org/entity/Q80228      # dessert
+# Lifestyle Habits
+dating:category:smoking
+dating:category:drinking
+dating:category:children
+dating:category:religion
+dating:category:zodiac
 
-# Professions & Occupations
-http://www.wikidata.org/entity/Q28640      # profession
-http://www.wikidata.org/entity/Q12737077   # occupation
-
-# Arts & Creativity
-http://www.wikidata.org/entity/Q1792379    # art form
-http://www.wikidata.org/entity/Q184485     # performing art
-http://www.wikidata.org/entity/Q11639      # dance
-http://www.wikidata.org/entity/Q11629      # art movement
-
-# Literature & Writing
-http://www.wikidata.org/entity/Q223393     # literary genre
-
-# Languages
-http://www.wikidata.org/entity/Q34770      # language
-http://www.wikidata.org/entity/Q33742      # natural language
-
-# Education & Knowledge
-http://www.wikidata.org/entity/Q11862829   # academic discipline
-
-# Lifestyle & Values
-http://www.wikidata.org/entity/Q32090      # lifestyle
-http://www.wikidata.org/entity/Q9174       # religion
-http://www.wikidata.org/entity/Q49773      # social movement
-http://www.wikidata.org/entity/Q12909644   # political ideology
-
-# Personality
-http://www.wikidata.org/entity/Q3277269    # personality trait
-
-# Collecting
-http://www.wikidata.org/entity/Q208165     # collecting
-
-# Technology
-http://www.wikidata.org/entity/Q9143       # programming language
+# Relationship
+dating:category:relationship-status
+dating:category:looking-for
