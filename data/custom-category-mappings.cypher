@@ -115,7 +115,7 @@ MATCH (i:Item) WHERE i.uri IN [
   'http://www.wikidata.org/entity/Q542',      // athletics/track
   'http://www.wikidata.org/entity/Q36908',    // boxing
   'http://www.wikidata.org/entity/Q37517',    // MMA
-  'http://www.wikidata.org/entity/Q11424',    // judo
+  'http://www.wikidata.org/entity/Q11420',    // judo
   'http://www.wikidata.org/entity/Q103496',   // taekwondo
   'http://www.wikidata.org/entity/Q37930',    // karate
   'http://www.wikidata.org/entity/Q131359',   // Brazilian jiu-jitsu
