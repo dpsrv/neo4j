@@ -11,4 +11,4 @@ echo "Verifying URIs for custom category mappings ($ENV)..."
 echo "This searches your database for the correct Wikidata URIs."
 echo ""
 
-$CYPHER_SHELL $ENV < "$DATA_DIR/verify-uris.cypher"
+$CYPHER_SHELL $ENV < "$DATA_DIR/verify-uris-exact.cypher"
