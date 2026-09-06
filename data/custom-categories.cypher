@@ -232,3 +232,60 @@ ON CREATE SET c.prefLabel = ['Sleep Schedule@en'],
               c.description = ['When you sleep and wake@en'],
               c.enabled = true,
               c.itemCount = 0;
+
+// ============================================================
+// Set default relations for categories where it's implicit
+// If defaultRelation is set, skip the relation dialog
+// ============================================================
+
+// Demographics - always HAS
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:hair-color',
+  'dating:category:eye-color',
+  'dating:category:body-type',
+  'dating:category:ethnicity',
+  'dating:category:height',
+  'dating:category:weight',
+  'dating:category:gender',
+  'dating:category:orientation',
+  'dating:category:smoking',
+  'dating:category:drinking',
+  'dating:category:religion',
+  'dating:category:zodiac',
+  'dating:category:relationship-status',
+  'dating:category:sleep',
+  'dating:category:career',
+  'dating:category:education'
+]
+SET c.defaultRelation = 'HAS';
+
+// Looking for - always WANTS
+MATCH (c:Category {uri: 'dating:category:looking-for'})
+SET c.defaultRelation = 'WANTS';
+
+// Languages - always SPEAKS
+MATCH (c:Category {uri: 'dating:category:languages'})
+SET c.defaultRelation = 'SPEAKS';
+
+// Sports - typically PLAYS
+MATCH (c:Category {uri: 'dating:category:sports'})
+SET c.defaultRelation = 'PLAYS';
+
+// Music genres - typically LIKES
+MATCH (c:Category {uri: 'dating:category:music'})
+SET c.defaultRelation = 'LIKES';
+
+// Food - typically LIKES (but could be ALLERGIC, so maybe no default?)
+// Leaving food without default for now
+
+// Entertainment - typically LIKES
+MATCH (c:Category {uri: 'dating:category:entertainment'})
+SET c.defaultRelation = 'LIKES';
+
+// Values - always HAS
+MATCH (c:Category {uri: 'dating:category:values'})
+SET c.defaultRelation = 'HAS';
+
+// Lifestyle - always HAS
+MATCH (c:Category {uri: 'dating:category:lifestyle'})
+SET c.defaultRelation = 'HAS';
