@@ -44,3 +44,7 @@ dating:category:zodiac
 # Relationship
 dating:category:relationship-status
 dating:category:looking-for
+
+# Household & Living
+dating:category:household
+dating:category:sleep

@@ -781,6 +781,177 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
+// HOUSEHOLD PREFERENCES (custom items)
+// ============================================================
+
+// Temperature
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:temp-cold'})
+  ON CREATE SET i.prefLabel = ['Keep it cold (below 68°F/20°C)@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:temp-moderate'})
+  ON CREATE SET i.prefLabel = ['Moderate temperature (68-72°F/20-22°C)@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:temp-warm'})
+  ON CREATE SET i.prefLabel = ['Keep it warm (above 72°F/22°C)@en']
+MERGE (i)-[:P31]->(c);
+
+// Cleanliness
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:very-tidy'})
+  ON CREATE SET i.prefLabel = ['Very tidy - everything in its place@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:mostly-tidy'})
+  ON CREATE SET i.prefLabel = ['Mostly tidy - clean but lived-in@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:relaxed-mess'})
+  ON CREATE SET i.prefLabel = ['Relaxed about mess@en']
+MERGE (i)-[:P31]->(c);
+
+// Dishes
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:dishes-immediately'})
+  ON CREATE SET i.prefLabel = ['Dishes done immediately@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:dishes-same-day'})
+  ON CREATE SET i.prefLabel = ['Dishes done same day@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:dishes-when-needed'})
+  ON CREATE SET i.prefLabel = ['Dishes done when needed@en']
+MERGE (i)-[:P31]->(c);
+
+// Noise level
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:quiet-home'})
+  ON CREATE SET i.prefLabel = ['Prefer a quiet home@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:background-noise'})
+  ON CREATE SET i.prefLabel = ['Like background music/TV@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:lively-home'})
+  ON CREATE SET i.prefLabel = ['Like a lively, active home@en']
+MERGE (i)-[:P31]->(c);
+
+// Guests
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:love-hosting'})
+  ON CREATE SET i.prefLabel = ['Love hosting guests@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:occasional-guests'})
+  ON CREATE SET i.prefLabel = ['Occasional guests are fine@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:prefer-privacy'})
+  ON CREATE SET i.prefLabel = ['Prefer privacy, few guests@en']
+MERGE (i)-[:P31]->(c);
+
+// Cooking
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:cook-daily'})
+  ON CREATE SET i.prefLabel = ['Cook most meals at home@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:cook-sometimes'})
+  ON CREATE SET i.prefLabel = ['Cook sometimes, eat out sometimes@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:mostly-takeout'})
+  ON CREATE SET i.prefLabel = ['Mostly takeout/delivery@en']
+MERGE (i)-[:P31]->(c);
+
+// Decorating style
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:minimalist'})
+  ON CREATE SET i.prefLabel = ['Minimalist style@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:cozy'})
+  ON CREATE SET i.prefLabel = ['Cozy and comfortable@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:eclectic'})
+  ON CREATE SET i.prefLabel = ['Eclectic/collected style@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:modern'})
+  ON CREATE SET i.prefLabel = ['Modern/contemporary@en']
+MERGE (i)-[:P31]->(c);
+
+// Work from home
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:wfh-always'})
+  ON CREATE SET i.prefLabel = ['Work from home full-time@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:wfh-hybrid'})
+  ON CREATE SET i.prefLabel = ['Hybrid - some days at home@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:household'})
+MERGE (i:Item {uri: 'dating:household:wfh-never'})
+  ON CREATE SET i.prefLabel = ['Work outside the home@en']
+MERGE (i)-[:P31]->(c);
+
+// ============================================================
+// SLEEP SCHEDULE (custom items)
+// ============================================================
+
+MATCH (c:Category {uri: 'dating:category:sleep'})
+MERGE (i:Item {uri: 'dating:sleep:early-bird'})
+  ON CREATE SET i.prefLabel = ['Early bird (up before 7am)@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:sleep'})
+MERGE (i:Item {uri: 'dating:sleep:moderate'})
+  ON CREATE SET i.prefLabel = ['Moderate (7am-9am)@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:sleep'})
+MERGE (i:Item {uri: 'dating:sleep:night-owl'})
+  ON CREATE SET i.prefLabel = ['Night owl (up late, sleep in)@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:sleep'})
+MERGE (i:Item {uri: 'dating:sleep:flexible'})
+  ON CREATE SET i.prefLabel = ['Flexible schedule@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:sleep'})
+MERGE (i:Item {uri: 'dating:sleep:needs-quiet'})
+  ON CREATE SET i.prefLabel = ['Light sleeper - need quiet@en']
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:sleep'})
+MERGE (i:Item {uri: 'dating:sleep:sleep-anywhere'})
+  ON CREATE SET i.prefLabel = ['Can sleep through anything@en']
+MERGE (i)-[:P31]->(c);
+
+// ============================================================
 // Update item counts for custom categories
 // ============================================================
 MATCH (c:Category)

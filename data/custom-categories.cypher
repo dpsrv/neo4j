@@ -218,3 +218,17 @@ ON CREATE SET c.prefLabel = ['Zodiac Sign@en'],
               c.description = ['Your astrological sign@en'],
               c.enabled = true,
               c.itemCount = 0;
+
+// Household Preferences
+MERGE (c:Item:Category {uri: 'dating:category:household'})
+ON CREATE SET c.prefLabel = ['Household@en'],
+              c.description = ['Your living preferences and habits@en'],
+              c.enabled = true,
+              c.itemCount = 0;
+
+// Sleep Schedule
+MERGE (c:Item:Category {uri: 'dating:category:sleep'})
+ON CREATE SET c.prefLabel = ['Sleep Schedule@en'],
+              c.description = ['When you sleep and wake@en'],
+              c.enabled = true,
+              c.itemCount = 0;
