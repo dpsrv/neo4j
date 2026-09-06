@@ -482,7 +482,7 @@ MERGE (i8)-[:P31]->(c);
 // ETHNICITY (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:ethnicity'})
-UNWIND ['White/Caucasian', 'Black/African American', 'Hispanic/Latino', 'East Asian', 'South Asian', 'Southeast Asian', 'Middle Eastern', 'Native American', 'Pacific Islander', 'Mixed/Multiracial', 'Other'] AS label
+UNWIND ['White/Caucasian', 'Black/African American', 'Hispanic/Latino', 'East Asian', 'South Asian', 'Southeast Asian', 'Middle Eastern', 'Jewish', 'Native American', 'Pacific Islander', 'Mixed/Multiracial', 'Other'] AS label
 MERGE (i:Item {uri: 'dating:ethnicity:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
