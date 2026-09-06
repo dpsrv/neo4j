@@ -447,102 +447,97 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// HAIR COLOR
+// HAIR COLOR (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:hair-color'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q1922956',  // blond/blonde
-  'http://www.wikidata.org/entity/Q2367101',  // brown hair
-  'http://www.wikidata.org/entity/Q1922938',  // black hair
-  'http://www.wikidata.org/entity/Q152357',   // red hair
-  'http://www.wikidata.org/entity/Q5765853',  // gray hair
-  'http://www.wikidata.org/entity/Q797239',   // white hair
-  'http://www.wikidata.org/entity/Q28472',    // auburn
-  'http://www.wikidata.org/entity/Q622566',   // strawberry blonde
-  'http://www.wikidata.org/entity/Q797455',   // bald
-  'http://www.wikidata.org/entity/Q3272270'   // dyed hair
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['Black', 'Brown', 'Blonde', 'Red', 'Auburn', 'Strawberry Blonde', 'Gray', 'White', 'Bald', 'Dyed/Other'] |
+  MERGE (i:Item {uri: 'dating:hair:' + replace(toLower(label), ' ', '-')})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
-// EYE COLOR
+// EYE COLOR (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:eye-color'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q17122705', // brown eyes
-  'http://www.wikidata.org/entity/Q17122834', // blue eyes
-  'http://www.wikidata.org/entity/Q17122854', // green eyes
-  'http://www.wikidata.org/entity/Q17122920', // hazel eyes
-  'http://www.wikidata.org/entity/Q17122868', // gray eyes
-  'http://www.wikidata.org/entity/Q3409781',  // amber eyes
-  'http://www.wikidata.org/entity/Q5765725'   // black eyes
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Black'] |
+  MERGE (i:Item {uri: 'dating:eyes:' + toLower(label)})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
-// BODY TYPE
+// BODY TYPE (custom items - subjective dating terms not in Wikidata)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:body-type'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q577528',   // athletic build
-  'http://www.wikidata.org/entity/Q212651',   // slim
-  'http://www.wikidata.org/entity/Q1328366',  // average body
-  'http://www.wikidata.org/entity/Q193268',   // muscular
-  'http://www.wikidata.org/entity/Q160544',   // stocky
-  'http://www.wikidata.org/entity/Q12136',    // overweight
-  'http://www.wikidata.org/entity/Q3010205',  // petite
-  'http://www.wikidata.org/entity/Q192828'    // tall
-]
-MERGE (i)-[:P31]->(c);
+MERGE (i1:Item {uri: 'dating:body-type:slim'})
+  ON CREATE SET i1.prefLabel = ['Slim@en']
+MERGE (i1)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:body-type'})
+MERGE (i2:Item {uri: 'dating:body-type:athletic'})
+  ON CREATE SET i2.prefLabel = ['Athletic@en']
+MERGE (i2)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:body-type'})
+MERGE (i3:Item {uri: 'dating:body-type:average'})
+  ON CREATE SET i3.prefLabel = ['Average@en']
+MERGE (i3)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:body-type'})
+MERGE (i4:Item {uri: 'dating:body-type:curvy'})
+  ON CREATE SET i4.prefLabel = ['Curvy@en']
+MERGE (i4)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:body-type'})
+MERGE (i5:Item {uri: 'dating:body-type:muscular'})
+  ON CREATE SET i5.prefLabel = ['Muscular@en']
+MERGE (i5)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:body-type'})
+MERGE (i6:Item {uri: 'dating:body-type:stocky'})
+  ON CREATE SET i6.prefLabel = ['Stocky@en']
+MERGE (i6)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:body-type'})
+MERGE (i7:Item {uri: 'dating:body-type:heavyset'})
+  ON CREATE SET i7.prefLabel = ['Heavyset@en']
+MERGE (i7)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:body-type'})
+MERGE (i8:Item {uri: 'dating:body-type:petite'})
+  ON CREATE SET i8.prefLabel = ['Petite@en']
+MERGE (i8)-[:P31]->(c);
 
 // ============================================================
-// ETHNICITY
+// ETHNICITY (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:ethnicity'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q49078',    // White/Caucasian
-  'http://www.wikidata.org/entity/Q50001',    // Black/African
-  'http://www.wikidata.org/entity/Q165192',   // Hispanic/Latino
-  'http://www.wikidata.org/entity/Q170585',   // Asian
-  'http://www.wikidata.org/entity/Q127885',   // South Asian
-  'http://www.wikidata.org/entity/Q11579',    // Middle Eastern
-  'http://www.wikidata.org/entity/Q60205',    // Native American
-  'http://www.wikidata.org/entity/Q863755',   // Pacific Islander
-  'http://www.wikidata.org/entity/Q1299831',  // mixed race
-  'http://www.wikidata.org/entity/Q766717'    // multiracial
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['White/Caucasian', 'Black/African American', 'Hispanic/Latino', 'East Asian', 'South Asian', 'Southeast Asian', 'Middle Eastern', 'Native American', 'Pacific Islander', 'Mixed/Multiracial', 'Other'] |
+  MERGE (i:Item {uri: 'dating:ethnicity:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
-// RELATIONSHIP STATUS
+// RELATIONSHIP STATUS (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:relationship-status'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q156066',   // single
-  'http://www.wikidata.org/entity/Q30002',    // divorced
-  'http://www.wikidata.org/entity/Q753270',   // separated
-  'http://www.wikidata.org/entity/Q234953',   // widowed
-  'http://www.wikidata.org/entity/Q36370',    // married
-  'http://www.wikidata.org/entity/Q124446',   // engaged
-  'http://www.wikidata.org/entity/Q3077795',  // in a relationship
-  'http://www.wikidata.org/entity/Q188830'    // open relationship
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['Single', 'Divorced', 'Separated', 'Widowed', 'In a Relationship', 'Its Complicated', 'Open Relationship'] |
+  MERGE (i:Item {uri: 'dating:relationship:' + replace(toLower(label), ' ', '-')})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
-// LOOKING FOR
+// LOOKING FOR (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:looking-for'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q18242689', // friendship
-  'http://www.wikidata.org/entity/Q107413',   // dating
-  'http://www.wikidata.org/entity/Q8445',     // long-term relationship
-  'http://www.wikidata.org/entity/Q8440',     // marriage
-  'http://www.wikidata.org/entity/Q189329',   // casual relationship
-  'http://www.wikidata.org/entity/Q748351',   // networking
-  'http://www.wikidata.org/entity/Q177634'    // companionship
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['Friendship', 'Dating', 'Long-term Relationship', 'Marriage', 'Casual', 'Networking', 'Not Sure Yet'] |
+  MERGE (i:Item {uri: 'dating:looking-for:' + replace(toLower(label), ' ', '-')})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
 // HEIGHT (custom items with ranges)
@@ -616,38 +611,24 @@ MERGE (i:Item {uri: 'dating:weight:over-220'})
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// GENDER
+// GENDER (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:gender'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q6581097',  // male
-  'http://www.wikidata.org/entity/Q6581072',  // female
-  'http://www.wikidata.org/entity/Q48270',    // non-binary
-  'http://www.wikidata.org/entity/Q1097630',  // transgender woman
-  'http://www.wikidata.org/entity/Q2449503',  // transgender man
-  'http://www.wikidata.org/entity/Q505371',   // agender
-  'http://www.wikidata.org/entity/Q189125',   // genderqueer
-  'http://www.wikidata.org/entity/Q1399232',  // genderfluid
-  'http://www.wikidata.org/entity/Q27679766'  // two-spirit
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['Man', 'Woman', 'Non-binary', 'Transgender Man', 'Transgender Woman', 'Genderqueer', 'Genderfluid', 'Agender', 'Two-Spirit', 'Other'] |
+  MERGE (i:Item {uri: 'dating:gender:' + replace(toLower(label), ' ', '-')})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
-// SEXUAL ORIENTATION
+// SEXUAL ORIENTATION (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:orientation'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q1035954',  // heterosexual
-  'http://www.wikidata.org/entity/Q6636',     // homosexual
-  'http://www.wikidata.org/entity/Q43200',    // bisexual
-  'http://www.wikidata.org/entity/Q271534',   // pansexual
-  'http://www.wikidata.org/entity/Q182985',   // asexual
-  'http://www.wikidata.org/entity/Q656888',   // demisexual
-  'http://www.wikidata.org/entity/Q2827881',  // queer
-  'http://www.wikidata.org/entity/Q3277905',  // questioning
-  'http://www.wikidata.org/entity/Q592960'    // gay
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['Straight', 'Gay', 'Lesbian', 'Bisexual', 'Pansexual', 'Asexual', 'Demisexual', 'Queer', 'Questioning', 'Other'] |
+  MERGE (i:Item {uri: 'dating:orientation:' + toLower(label)})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
 // SMOKING
@@ -742,43 +723,21 @@ MERGE (i)-[:P31]->(c);
 // RELIGION
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:religion'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q5043',     // Christianity
-  'http://www.wikidata.org/entity/Q1841',     // Catholicism
-  'http://www.wikidata.org/entity/Q23540',    // Protestantism
-  'http://www.wikidata.org/entity/Q432',      // Islam
-  'http://www.wikidata.org/entity/Q9268',     // Judaism
-  'http://www.wikidata.org/entity/Q748',      // Buddhism
-  'http://www.wikidata.org/entity/Q9089',     // Hinduism
-  'http://www.wikidata.org/entity/Q12047',    // Sikhism
-  'http://www.wikidata.org/entity/Q106039',   // agnosticism
-  'http://www.wikidata.org/entity/Q7066',     // atheism
-  'http://www.wikidata.org/entity/Q131539',   // spiritual
-  'http://www.wikidata.org/entity/Q9585',     // Mormonism/LDS
-  'http://www.wikidata.org/entity/Q33203',    // Orthodox Christianity
-  'http://www.wikidata.org/entity/Q9268'      // Judaism
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['Christian', 'Catholic', 'Protestant', 'Orthodox Christian', 'Muslim', 'Jewish', 'Buddhist', 'Hindu', 'Sikh', 'Mormon/LDS', 'Spiritual', 'Agnostic', 'Atheist', 'Other'] |
+  MERGE (i:Item {uri: 'dating:religion:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
-// ZODIAC SIGN
+// ZODIAC SIGN (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:zodiac'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q37930',    // Aries
-  'http://www.wikidata.org/entity/Q37933',    // Taurus
-  'http://www.wikidata.org/entity/Q37936',    // Gemini
-  'http://www.wikidata.org/entity/Q37939',    // Cancer
-  'http://www.wikidata.org/entity/Q37942',    // Leo
-  'http://www.wikidata.org/entity/Q37945',    // Virgo
-  'http://www.wikidata.org/entity/Q37948',    // Libra
-  'http://www.wikidata.org/entity/Q37951',    // Scorpio
-  'http://www.wikidata.org/entity/Q37954',    // Sagittarius
-  'http://www.wikidata.org/entity/Q37957',    // Capricorn
-  'http://www.wikidata.org/entity/Q37960',    // Aquarius
-  'http://www.wikidata.org/entity/Q37963'     // Pisces
-]
-MERGE (i)-[:P31]->(c);
+FOREACH (label IN ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'] |
+  MERGE (i:Item {uri: 'dating:zodiac:' + toLower(label)})
+    ON CREATE SET i.prefLabel = [label + '@en']
+  MERGE (i)-[:P31]->(c)
+);
 
 // ============================================================
 // HOUSEHOLD PREFERENCES (custom items)
