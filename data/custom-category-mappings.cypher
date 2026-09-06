@@ -400,59 +400,21 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// CAREER (fields, not specific jobs)
+// CAREER (custom items - career fields)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:career'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q11016',    // technology
-  'http://www.wikidata.org/entity/Q132151',   // healthcare
-  'http://www.wikidata.org/entity/Q8134',     // finance
-  'http://www.wikidata.org/entity/Q8065',     // education
-  'http://www.wikidata.org/entity/Q735',      // art
-  'http://www.wikidata.org/entity/Q638',      // music
-  'http://www.wikidata.org/entity/Q11016',    // engineering
-  'http://www.wikidata.org/entity/Q336',      // science
-  'http://www.wikidata.org/entity/Q4830453',  // business
-  'http://www.wikidata.org/entity/Q5398426',  // media
-  'http://www.wikidata.org/entity/Q7187',     // law
-  'http://www.wikidata.org/entity/Q11229',    // marketing
-  'http://www.wikidata.org/entity/Q131257',   // real estate
-  'http://www.wikidata.org/entity/Q11366',    // hospitality
-  'http://www.wikidata.org/entity/Q23017427', // nonprofit
-  'http://www.wikidata.org/entity/Q7278',     // government
-  'http://www.wikidata.org/entity/Q28114423', // retail
-  'http://www.wikidata.org/entity/Q1348589',  // consulting
-  'http://www.wikidata.org/entity/Q134041',   // entrepreneurship
-  'http://www.wikidata.org/entity/Q11184'     // journalism
-]
+UNWIND ['Technology', 'Healthcare', 'Finance', 'Education', 'Art & Design', 'Music & Entertainment', 'Engineering', 'Science & Research', 'Business', 'Media & Communications', 'Legal', 'Marketing & Sales', 'Real Estate', 'Hospitality', 'Nonprofit', 'Government', 'Retail', 'Consulting', 'Entrepreneur', 'Journalism', 'Construction', 'Manufacturing', 'Transportation', 'Agriculture', 'Military', 'Student', 'Retired', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:career:' + replace(replace(toLower(label), ' ', '-'), '&', 'and')})
+  ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// EDUCATION (fields of study)
+// EDUCATION (custom items - fields of study)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:education'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q21198',    // computer science
-  'http://www.wikidata.org/entity/Q8134',     // economics
-  'http://www.wikidata.org/entity/Q7184903',  // engineering
-  'http://www.wikidata.org/entity/Q413',      // physics
-  'http://www.wikidata.org/entity/Q420',      // biology
-  'http://www.wikidata.org/entity/Q2329',     // chemistry
-  'http://www.wikidata.org/entity/Q395',      // mathematics
-  'http://www.wikidata.org/entity/Q9418',     // psychology
-  'http://www.wikidata.org/entity/Q5891',     // philosophy
-  'http://www.wikidata.org/entity/Q309',      // history
-  'http://www.wikidata.org/entity/Q8242',     // literature
-  'http://www.wikidata.org/entity/Q7187',     // law
-  'http://www.wikidata.org/entity/Q11190',    // medicine
-  'http://www.wikidata.org/entity/Q21201',    // sociology
-  'http://www.wikidata.org/entity/Q7163',     // political science
-  'http://www.wikidata.org/entity/Q735',      // art
-  'http://www.wikidata.org/entity/Q11639',    // architecture
-  'http://www.wikidata.org/entity/Q11184',    // journalism
-  'http://www.wikidata.org/entity/Q11016',    // business
-  'http://www.wikidata.org/entity/Q8065'      // education
-]
+UNWIND ['Computer Science', 'Economics', 'Engineering', 'Physics', 'Biology', 'Chemistry', 'Mathematics', 'Psychology', 'Philosophy', 'History', 'Literature', 'Law', 'Medicine', 'Sociology', 'Political Science', 'Art', 'Architecture', 'Journalism', 'Business', 'Communications', 'Education', 'Nursing', 'Music', 'Theater', 'Film', 'Environmental Science', 'High School', 'Trade School', 'Some College', 'Bachelors', 'Masters', 'Doctorate', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:education:' + replace(toLower(label), ' ', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
