@@ -10,6 +10,10 @@ WHERE c.uri STARTS WITH 'dating:'
   AND NOT i.uri STARTS WITH 'dating:'
 DELETE r;
 
+// Disable deprecated categories (replaced by new ones)
+MATCH (c:Category {uri: 'dating:category:education'})
+SET c.enabled = false;
+
 // ============================================================
 // PETS
 // ============================================================
@@ -409,11 +413,20 @@ MERGE (i:Item {uri: 'dating:career:' + replace(replace(toLower(label), ' ', '-')
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// EDUCATION (custom items - fields of study)
+// EDUCATION LEVEL (custom items - degree/enrollment)
 // ============================================================
-MATCH (c:Category {uri: 'dating:category:education'})
-UNWIND ['Computer Science', 'Economics', 'Engineering', 'Physics', 'Biology', 'Chemistry', 'Mathematics', 'Psychology', 'Philosophy', 'History', 'Literature', 'Law', 'Medicine', 'Sociology', 'Political Science', 'Art', 'Architecture', 'Journalism', 'Business', 'Communications', 'Education', 'Nursing', 'Music', 'Theater', 'Film', 'Environmental Science', 'High School', 'Trade School', 'Some College', 'Bachelors', 'Masters', 'Doctorate', 'Other'] AS label
-MERGE (i:Item {uri: 'dating:education:' + replace(toLower(label), ' ', '-')})
+MATCH (c:Category {uri: 'dating:category:education-level'})
+UNWIND ['High School', 'Some High School', 'Trade/Vocational School', 'Some College', 'Associates Degree', 'Bachelors Degree', 'Masters Degree', 'Doctorate/PhD', 'Professional Degree (MD, JD)', 'Currently in School', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:education-level:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
+
+// ============================================================
+// FIELD OF STUDY (custom items - academic subjects)
+// ============================================================
+MATCH (c:Category {uri: 'dating:category:field-of-study'})
+UNWIND ['Computer Science', 'Information Technology', 'Engineering', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'Environmental Science', 'Medicine', 'Nursing', 'Psychology', 'Sociology', 'Political Science', 'Economics', 'Business', 'Finance', 'Accounting', 'Marketing', 'Law', 'Philosophy', 'History', 'Literature', 'Communications', 'Journalism', 'Education', 'Art', 'Music', 'Theater', 'Film', 'Architecture', 'Graphic Design', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:field-of-study:' + replace(toLower(label), ' ', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 

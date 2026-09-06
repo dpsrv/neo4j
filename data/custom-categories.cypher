@@ -107,10 +107,17 @@ ON CREATE SET c.prefLabel = ['Career@en'],
               c.enabled = true,
               c.itemCount = 0;
 
-// Education
-MERGE (c:Item:Category {uri: 'dating:category:education'})
-ON CREATE SET c.prefLabel = ['Education@en'],
-              c.description = ['What you studied or study@en'],
+// Education Level
+MERGE (c:Item:Category {uri: 'dating:category:education-level'})
+ON CREATE SET c.prefLabel = ['Education Level@en'],
+              c.description = ['Your highest degree or current enrollment@en'],
+              c.enabled = true,
+              c.itemCount = 0;
+
+// Field of Study
+MERGE (c:Item:Category {uri: 'dating:category:field-of-study'})
+ON CREATE SET c.prefLabel = ['Field of Study@en'],
+              c.description = ['What you studied or are studying@en'],
               c.enabled = true,
               c.itemCount = 0;
 
@@ -255,9 +262,13 @@ MATCH (c:Category) WHERE c.uri IN [
   'dating:category:relationship-status',
   'dating:category:sleep',
   'dating:category:career',
-  'dating:category:education'
+  'dating:category:education-level'
 ]
 SET c.defaultRelation = 'HAS';
+
+// Field of study - STUDIES
+MATCH (c:Category {uri: 'dating:category:field-of-study'})
+SET c.defaultRelation = 'STUDIES';
 
 // Looking for - always WANTS
 MATCH (c:Category {uri: 'dating:category:looking-for'})
