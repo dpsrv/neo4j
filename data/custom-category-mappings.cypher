@@ -450,21 +450,19 @@ MERGE (i)-[:P31]->(c);
 // HAIR COLOR (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:hair-color'})
-FOREACH (label IN ['Black', 'Brown', 'Blonde', 'Red', 'Auburn', 'Strawberry Blonde', 'Gray', 'White', 'Bald', 'Dyed/Other'] |
-  MERGE (i:Item {uri: 'dating:hair:' + replace(toLower(label), ' ', '-')})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['Black', 'Brown', 'Blonde', 'Red', 'Auburn', 'Strawberry Blonde', 'Gray', 'White', 'Bald', 'Dyed/Other'] AS label
+MERGE (i:Item {uri: 'dating:hair:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // EYE COLOR (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:eye-color'})
-FOREACH (label IN ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Black'] |
-  MERGE (i:Item {uri: 'dating:eyes:' + toLower(label)})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Black'] AS label
+MERGE (i:Item {uri: 'dating:eyes:' + toLower(label)})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // BODY TYPE (custom items - subjective dating terms not in Wikidata)
@@ -513,31 +511,28 @@ MERGE (i8)-[:P31]->(c);
 // ETHNICITY (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:ethnicity'})
-FOREACH (label IN ['White/Caucasian', 'Black/African American', 'Hispanic/Latino', 'East Asian', 'South Asian', 'Southeast Asian', 'Middle Eastern', 'Native American', 'Pacific Islander', 'Mixed/Multiracial', 'Other'] |
-  MERGE (i:Item {uri: 'dating:ethnicity:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['White/Caucasian', 'Black/African American', 'Hispanic/Latino', 'East Asian', 'South Asian', 'Southeast Asian', 'Middle Eastern', 'Native American', 'Pacific Islander', 'Mixed/Multiracial', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:ethnicity:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // RELATIONSHIP STATUS (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:relationship-status'})
-FOREACH (label IN ['Single', 'Divorced', 'Separated', 'Widowed', 'In a Relationship', 'Its Complicated', 'Open Relationship'] |
-  MERGE (i:Item {uri: 'dating:relationship:' + replace(toLower(label), ' ', '-')})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['Single', 'Divorced', 'Separated', 'Widowed', 'In a Relationship', 'Its Complicated', 'Open Relationship'] AS label
+MERGE (i:Item {uri: 'dating:relationship:' + replace(toLower(label), ' ', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // LOOKING FOR (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:looking-for'})
-FOREACH (label IN ['Friendship', 'Dating', 'Long-term Relationship', 'Marriage', 'Casual', 'Networking', 'Not Sure Yet'] |
-  MERGE (i:Item {uri: 'dating:looking-for:' + replace(toLower(label), ' ', '-')})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['Friendship', 'Dating', 'Long-term Relationship', 'Marriage', 'Casual', 'Networking', 'Not Sure Yet'] AS label
+MERGE (i:Item {uri: 'dating:looking-for:' + replace(toLower(label), ' ', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // HEIGHT (custom items with ranges)
@@ -614,21 +609,19 @@ MERGE (i)-[:P31]->(c);
 // GENDER (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:gender'})
-FOREACH (label IN ['Man', 'Woman', 'Non-binary', 'Transgender Man', 'Transgender Woman', 'Genderqueer', 'Genderfluid', 'Agender', 'Two-Spirit', 'Other'] |
-  MERGE (i:Item {uri: 'dating:gender:' + replace(toLower(label), ' ', '-')})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['Man', 'Woman', 'Non-binary', 'Transgender Man', 'Transgender Woman', 'Genderqueer', 'Genderfluid', 'Agender', 'Two-Spirit', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:gender:' + replace(toLower(label), ' ', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // SEXUAL ORIENTATION (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:orientation'})
-FOREACH (label IN ['Straight', 'Gay', 'Lesbian', 'Bisexual', 'Pansexual', 'Asexual', 'Demisexual', 'Queer', 'Questioning', 'Other'] |
-  MERGE (i:Item {uri: 'dating:orientation:' + toLower(label)})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['Straight', 'Gay', 'Lesbian', 'Bisexual', 'Pansexual', 'Asexual', 'Demisexual', 'Queer', 'Questioning', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:orientation:' + toLower(label)})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // SMOKING
@@ -723,21 +716,19 @@ MERGE (i)-[:P31]->(c);
 // RELIGION
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:religion'})
-FOREACH (label IN ['Christian', 'Catholic', 'Protestant', 'Orthodox Christian', 'Muslim', 'Jewish', 'Buddhist', 'Hindu', 'Sikh', 'Mormon/LDS', 'Spiritual', 'Agnostic', 'Atheist', 'Other'] |
-  MERGE (i:Item {uri: 'dating:religion:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['Christian', 'Catholic', 'Protestant', 'Orthodox Christian', 'Muslim', 'Jewish', 'Buddhist', 'Hindu', 'Sikh', 'Mormon/LDS', 'Spiritual', 'Agnostic', 'Atheist', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:religion:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // ZODIAC SIGN (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:zodiac'})
-FOREACH (label IN ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'] |
-  MERGE (i:Item {uri: 'dating:zodiac:' + toLower(label)})
-    ON CREATE SET i.prefLabel = [label + '@en']
-  MERGE (i)-[:P31]->(c)
-);
+UNWIND ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'] AS label
+MERGE (i:Item {uri: 'dating:zodiac:' + toLower(label)})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // HOUSEHOLD PREFERENCES (custom items)
