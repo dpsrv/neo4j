@@ -2,6 +2,15 @@
 // Run this after custom-categories.cypher
 
 // ============================================================
+// CLEANUP: Remove old P31 relationships to custom categories
+// This removes any Wikidata items incorrectly mapped to dating categories
+// ============================================================
+MATCH (i:Item)-[r:P31]->(c:Category)
+WHERE c.uri STARTS WITH 'dating:'
+  AND NOT i.uri STARTS WITH 'dating:'
+DELETE r;
+
+// ============================================================
 // PETS
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:pets'})
