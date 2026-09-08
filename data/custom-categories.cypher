@@ -44,12 +44,14 @@ ON CREATE SET c.prefLabel = ['Music@en'],
               c.enabled = true,
               c.itemCount = 0;
 
-// Food & Drink
+// Favorite Cuisines
 MERGE (c:Item:Category {uri: 'dating:category:food-drink'})
-ON CREATE SET c.prefLabel = ['Food & Drink@en'],
-              c.description = ['Cuisines and beverages you enjoy@en'],
+ON CREATE SET c.prefLabel = ['Favorite Cuisines@en'],
+              c.description = ['Types of food you enjoy@en'],
               c.enabled = true,
-              c.itemCount = 0;
+              c.itemCount = 0
+ON MATCH SET c.prefLabel = ['Favorite Cuisines@en'],
+             c.description = ['Types of food you enjoy@en'];
 
 // Entertainment
 MERGE (c:Item:Category {uri: 'dating:category:entertainment'})

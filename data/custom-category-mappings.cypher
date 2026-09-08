@@ -173,36 +173,13 @@ MERGE (i)-[:P31]->(c);
 // ============================================================
 // FOOD & DRINK
 // ============================================================
+// ============================================================
+// FAVORITE CUISINES (custom items)
+// ============================================================
 MATCH (c:Category {uri: 'dating:category:food-drink'})
-MATCH (i:Item) WHERE i.uri IN [
-  // Cuisines
-  'http://www.wikidata.org/entity/Q11246',    // Italian cuisine
-  'http://www.wikidata.org/entity/Q200664',   // Mexican cuisine
-  'http://www.wikidata.org/entity/Q184275',   // Japanese cuisine
-  'http://www.wikidata.org/entity/Q192764',   // Chinese cuisine
-  'http://www.wikidata.org/entity/Q127995',   // Indian cuisine
-  'http://www.wikidata.org/entity/Q192781',   // Thai cuisine
-  'http://www.wikidata.org/entity/Q132922',   // French cuisine
-  'http://www.wikidata.org/entity/Q200540',   // Korean cuisine
-  'http://www.wikidata.org/entity/Q181674',   // Greek cuisine
-  'http://www.wikidata.org/entity/Q728564',   // Mediterranean cuisine
-  'http://www.wikidata.org/entity/Q192935',   // Vietnamese cuisine
-  'http://www.wikidata.org/entity/Q181696',   // American cuisine
-  // Dietary preferences
-  'http://www.wikidata.org/entity/Q181138',   // veganism
-  'http://www.wikidata.org/entity/Q11404',    // vegetarianism
-  'http://www.wikidata.org/entity/Q1135104',  // pescatarian
-  'http://www.wikidata.org/entity/Q379813',   // gluten-free
-  'http://www.wikidata.org/entity/Q207952',   // kosher
-  'http://www.wikidata.org/entity/Q165950',   // halal
-  // Beverages
-  'http://www.wikidata.org/entity/Q8851',     // coffee
-  'http://www.wikidata.org/entity/Q6097',     // tea
-  'http://www.wikidata.org/entity/Q44',       // beer
-  'http://www.wikidata.org/entity/Q282',      // wine
-  'http://www.wikidata.org/entity/Q134768',   // cocktails
-  'http://www.wikidata.org/entity/Q185102'    // whiskey
-]
+UNWIND ['Italian', 'Mexican', 'Japanese', 'Chinese', 'Indian', 'Thai', 'French', 'Korean', 'Greek', 'Mediterranean', 'Vietnamese', 'American', 'Middle Eastern', 'Spanish', 'Ethiopian', 'Brazilian', 'Caribbean', 'Southern/Soul Food', 'Sushi', 'BBQ', 'Seafood', 'Pizza', 'Tacos', 'Ramen', 'Dim Sum', 'Brunch', 'Fine Dining', 'Street Food', 'Home Cooking'] AS label
+MERGE (i:Item {uri: 'dating:cuisine:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
