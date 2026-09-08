@@ -137,12 +137,13 @@ ON CREATE SET c.prefLabel = ['Education Level@en'],
               c.enabled = true,
               c.itemCount = 0;
 
-// Field of Study
+// Education Background
 MERGE (c:Item:Category {uri: 'dating:category:field-of-study'})
-ON CREATE SET c.prefLabel = ['Field of Study@en'],
+ON CREATE SET c.prefLabel = ['Education Background@en'],
               c.description = ['What you studied or are studying@en'],
               c.enabled = true,
-              c.itemCount = 0;
+              c.itemCount = 0
+ON MATCH SET c.prefLabel = ['Education Background@en'];
 
 // Hair Color
 MERGE (c:Item:Category {uri: 'dating:category:hair-color'})

@@ -11,15 +11,17 @@ WHERE c.uri STARTS WITH 'dating:'
 DELETE r;
 
 // Disable deprecated categories (replaced by new ones)
-MATCH (c:Category {uri: 'dating:category:education'})
-SET c.enabled = false;
-
 MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:education',
   'dating:category:social',
   'dating:category:values',
   'dating:category:lifestyle'
 ]
 SET c.enabled = false;
+
+// Also remove any items mapped to deprecated categories
+MATCH (i:Item)-[r:P31]->(c:Category {uri: 'dating:category:education'})
+DELETE r;
 
 // ============================================================
 // PETS
