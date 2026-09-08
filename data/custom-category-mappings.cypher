@@ -15,7 +15,9 @@ MATCH (c:Category) WHERE c.uri IN [
   'dating:category:education',
   'dating:category:social',
   'dating:category:values',
-  'dating:category:lifestyle'
+  'dating:category:lifestyle',
+  'dating:category:personality',
+  'dating:category:fitness'
 ]
 SET c.enabled = false;
 
@@ -118,19 +120,20 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// SPORTS
+// SPORTS & FITNESS (merged)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:sports'})
-UNWIND ['Soccer', 'Basketball', 'Tennis', 'Volleyball', 'Baseball', 'American Football', 'Ice Hockey', 'Golf', 'Badminton', 'Table Tennis', 'Cycling', 'Swimming', 'Track & Field', 'Boxing', 'MMA', 'Judo', 'Taekwondo', 'Karate', 'Brazilian Jiu-Jitsu', 'Wrestling', 'Cricket', 'Rugby', 'Lacrosse', 'Softball', 'Squash', 'Racquetball', 'Pickleball', 'Bowling', 'Darts', 'Archery', 'Skiing', 'Snowboarding', 'Surfing', 'Skateboarding', 'Rock Climbing', 'Fencing', 'Rowing', 'Water Polo', 'Handball', 'Field Hockey'] AS label
+UNWIND ['Soccer', 'Basketball', 'Tennis', 'Volleyball', 'Baseball', 'American Football', 'Ice Hockey', 'Golf', 'Badminton', 'Table Tennis', 'Cycling', 'Swimming', 'Track & Field', 'Boxing', 'MMA', 'Judo', 'Taekwondo', 'Karate', 'Brazilian Jiu-Jitsu', 'Wrestling', 'Cricket', 'Rugby', 'Lacrosse', 'Softball', 'Squash', 'Racquetball', 'Pickleball', 'Bowling', 'Darts', 'Archery', 'Skiing', 'Snowboarding', 'Surfing', 'Skateboarding', 'Rock Climbing', 'Fencing', 'Rowing', 'Water Polo', 'Handball', 'Field Hockey', 'Weightlifting', 'CrossFit', 'Yoga', 'Pilates', 'Running', 'Jogging', 'Aerobics', 'Spinning', 'HIIT', 'Calisthenics', 'Barre', 'Hiking', 'Walking', 'Dancing', 'Gymnastics'] AS label
 MERGE (i:Item {uri: 'dating:sport:' + replace(replace(toLower(label), ' ', '-'), '&', 'and')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// FITNESS (custom items)
+// FITNESS - DEPRECATED (merged into Sports & Fitness)
 // ============================================================
-MATCH (c:Category {uri: 'dating:category:fitness'})
-UNWIND ['Weightlifting', 'CrossFit', 'Yoga', 'Pilates', 'Running', 'Jogging', 'Cycling', 'Swimming', 'Aerobics', 'Spinning', 'HIIT', 'Calisthenics', 'Barre', 'Hiking', 'Walking', 'Dancing', 'Martial Arts', 'Rock Climbing', 'Gymnastics', 'Personal Training'] AS label
+// Items kept for backwards compatibility, mapped to sports category
+MATCH (c:Category {uri: 'dating:category:sports'})
+UNWIND ['Weightlifting', 'CrossFit', 'Yoga', 'Pilates', 'Running', 'Jogging', 'Aerobics', 'Spinning', 'HIIT', 'Calisthenics', 'Barre', 'Hiking', 'Walking', 'Dancing', 'Gymnastics'] AS label
 MERGE (i:Item {uri: 'dating:fitness:' + replace(toLower(label), ' ', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);

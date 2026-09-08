@@ -23,19 +23,14 @@ ON CREATE SET c.prefLabel = ['Indoor Activities@en'],
               c.enabled = true,
               c.itemCount = 0;
 
-// Sports
+// Sports & Fitness
 MERGE (c:Item:Category {uri: 'dating:category:sports'})
-ON CREATE SET c.prefLabel = ['Sports@en'],
-              c.description = ['Sports you play or follow@en'],
+ON CREATE SET c.prefLabel = ['Sports & Fitness@en'],
+              c.description = ['Sports you play and how you stay active@en'],
               c.enabled = true,
-              c.itemCount = 0;
-
-// Fitness
-MERGE (c:Item:Category {uri: 'dating:category:fitness'})
-ON CREATE SET c.prefLabel = ['Fitness@en'],
-              c.description = ['How you stay active@en'],
-              c.enabled = true,
-              c.itemCount = 0;
+              c.itemCount = 0
+ON MATCH SET c.prefLabel = ['Sports & Fitness@en'],
+             c.description = ['Sports you play and how you stay active@en'];
 
 // Music
 MERGE (c:Item:Category {uri: 'dating:category:music'})
@@ -434,7 +429,6 @@ SET c.categoryGroup = 'Work & Education', c.groupOrder = 5;
 
 // Personality & Values
 MATCH (c:Category) WHERE c.uri IN [
-  'dating:category:personality',
   'dating:category:myers-briggs',
   'dating:category:what-i-value'
 ]
@@ -443,7 +437,6 @@ SET c.categoryGroup = 'Personality & Values', c.groupOrder = 6;
 // Interests & Hobbies
 MATCH (c:Category) WHERE c.uri IN [
   'dating:category:sports',
-  'dating:category:fitness',
   'dating:category:outdoor-activities',
   'dating:category:indoor-activities',
   'dating:category:creative',
