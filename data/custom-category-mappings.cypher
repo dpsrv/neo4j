@@ -183,31 +183,12 @@ MERGE (i:Item {uri: 'dating:cuisine:' + replace(replace(toLower(label), ' ', '-'
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// ENTERTAINMENT
+// ENTERTAINMENT (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:entertainment'})
-MATCH (i:Item) WHERE i.uri IN [
-  'http://www.wikidata.org/entity/Q11424',    // action films
-  'http://www.wikidata.org/entity/Q157443',   // comedy films
-  'http://www.wikidata.org/entity/Q130232',   // drama films
-  'http://www.wikidata.org/entity/Q959790',   // horror films
-  'http://www.wikidata.org/entity/Q188473',   // science fiction
-  'http://www.wikidata.org/entity/Q52162262', // thriller
-  'http://www.wikidata.org/entity/Q203775',   // romantic comedy
-  'http://www.wikidata.org/entity/Q130232',   // documentaries
-  'http://www.wikidata.org/entity/Q1107',     // anime
-  'http://www.wikidata.org/entity/Q5398426',  // TV series
-  'http://www.wikidata.org/entity/Q590870',   // reality TV
-  'http://www.wikidata.org/entity/Q7889',     // video games
-  'http://www.wikidata.org/entity/Q200092',   // podcasts
-  'http://www.wikidata.org/entity/Q51424',    // stand-up comedy
-  'http://www.wikidata.org/entity/Q7569',     // theater
-  'http://www.wikidata.org/entity/Q1344',     // opera
-  'http://www.wikidata.org/entity/Q9730',     // concerts
-  'http://www.wikidata.org/entity/Q622812',   // true crime
-  'http://www.wikidata.org/entity/Q17143321', // audiobooks
-  'http://www.wikidata.org/entity/Q131272'    // musicals
-]
+UNWIND ['Action Films', 'Comedy Films', 'Drama', 'Horror Films', 'Science Fiction', 'Thriller', 'Romantic Comedy', 'Documentaries', 'Anime', 'TV Series', 'Reality TV', 'Video Games', 'Podcasts', 'Stand-Up Comedy', 'Theater', 'Opera', 'Concerts', 'True Crime', 'Audiobooks', 'Musicals'] AS label
+MERGE (i:Item {uri: 'dating:entertainment:' + replace(toLower(label), ' ', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================

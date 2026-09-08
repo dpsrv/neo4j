@@ -401,5 +401,68 @@ MATCH (c:Item {uri: 'dating:creative:woodworking'})
 MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q11463'})
 MERGE (c)-[:P460]->(w);
 
+// ============================================================
+// ENTERTAINMENT
+// ============================================================
+MATCH (c:Item {uri: 'dating:entertainment:action-films'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q188473'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:comedy-films'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q157443'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:drama'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q130232'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:horror-films'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q200092'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:science-fiction'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q188473'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:anime'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q1107'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:tv-series'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q5398426'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:video-games'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q7889'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:podcasts'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q200092'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:stand-up-comedy'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q51424'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:theater'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q7569'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:opera'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q1344'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:concerts'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q9730'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:audiobooks'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q17143321'})
+MERGE (c)-[:P460]->(w);
+
+MATCH (c:Item {uri: 'dating:entertainment:musicals'})
+MATCH (w:Item {uri: 'http://www.wikidata.org/entity/Q131272'})
+MERGE (c)-[:P460]->(w);
+
 // Note: Many custom items (body types, heights, relationship statuses, etc.)
 // don't have direct Wikidata equivalents as they're dating-app specific concepts
