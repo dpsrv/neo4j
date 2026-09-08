@@ -238,6 +238,24 @@ MERGE (i:Item {uri: 'dating:personality:' + toLower(label)})
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
+// MYERS-BRIGGS (custom items)
+// ============================================================
+MATCH (c:Category {uri: 'dating:category:myers-briggs'})
+UNWIND ['INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP', 'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP'] AS label
+MERGE (i:Item {uri: 'dating:mbti:' + toLower(label)})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
+
+// ============================================================
+// COMFORT TEMPERATURE (custom items)
+// ============================================================
+MATCH (c:Category {uri: 'dating:category:comfort-temp'})
+UNWIND ['Keep it cold (below 65°F)', 'Cool (65-68°F)', 'Moderate (68-72°F)', 'Warm (72-76°F)', 'Keep it warm (above 76°F)'] AS label
+MERGE (i:Item {uri: 'dating:temp:' + replace(replace(replace(toLower(label), ' ', '-'), '(', ''), ')', '')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
+
+// ============================================================
 // WHAT I VALUE (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:what-i-value'})

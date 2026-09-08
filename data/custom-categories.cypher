@@ -81,6 +81,20 @@ ON CREATE SET c.prefLabel = ['Personality@en'],
               c.enabled = true,
               c.itemCount = 0;
 
+// Myers-Briggs
+MERGE (c:Item:Category {uri: 'dating:category:myers-briggs'})
+ON CREATE SET c.prefLabel = ['Myers-Briggs@en'],
+              c.description = ['Your MBTI personality type@en'],
+              c.enabled = true,
+              c.itemCount = 0;
+
+// Comfort Temperature
+MERGE (c:Item:Category {uri: 'dating:category:comfort-temp'})
+ON CREATE SET c.prefLabel = ['Comfort Temperature@en'],
+              c.description = ['Your preferred indoor temperature@en'],
+              c.enabled = true,
+              c.itemCount = 0;
+
 // What I Value
 MERGE (c:Item:Category {uri: 'dating:category:what-i-value'})
 ON CREATE SET c.prefLabel = ['What I Value@en'],
@@ -352,10 +366,19 @@ SET c.defaultRelation = 'HAS';
 // Single select for new categories
 MATCH (c:Category) WHERE c.uri IN [
   'dating:category:personality',
+  'dating:category:myers-briggs',
   'dating:category:diet',
-  'dating:category:cannabis'
+  'dating:category:cannabis',
+  'dating:category:comfort-temp'
 ]
 SET c.maxItems = 1;
+
+// Myers-Briggs and Comfort Temp - HAS relation
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:myers-briggs',
+  'dating:category:comfort-temp'
+]
+SET c.defaultRelation = 'HAS';
 
 // ============================================================
 // Category groups for organizing in UI
@@ -394,7 +417,8 @@ MATCH (c:Category) WHERE c.uri IN [
   'dating:category:drinking',
   'dating:category:cannabis',
   'dating:category:diet',
-  'dating:category:sleep'
+  'dating:category:sleep',
+  'dating:category:comfort-temp'
 ]
 SET c.categoryGroup = 'Lifestyle & Habits', c.groupOrder = 4;
 
@@ -410,6 +434,7 @@ SET c.categoryGroup = 'Work & Education', c.groupOrder = 5;
 // Personality & Values
 MATCH (c:Category) WHERE c.uri IN [
   'dating:category:personality',
+  'dating:category:myers-briggs',
   'dating:category:what-i-value'
 ]
 SET c.categoryGroup = 'Personality & Values', c.groupOrder = 6;
