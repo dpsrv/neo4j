@@ -18,7 +18,11 @@ echo "Step 2: Mapping items to categories..."
 $CYPHER_SHELL $ENV < "$DATA_DIR/custom-category-mappings.cypher"
 
 echo ""
-echo "Step 3: Disabling Wikidata categories, enabling custom ones..."
+echo "Step 3: Linking custom items to Wikidata equivalents..."
+$CYPHER_SHELL $ENV < "$DATA_DIR/custom-to-wikidata-links.cypher"
+
+echo ""
+echo "Step 4: Disabling Wikidata categories, enabling custom ones..."
 $CYPHER_SHELL $ENV <<'CYPHER'
 // Disable all Wikidata categories
 MATCH (c:Category)
@@ -32,7 +36,7 @@ SET c.enabled = true;
 CYPHER
 
 echo ""
-echo "Step 4: Clearing Redis cache..."
+echo "Step 5: Clearing Redis cache..."
 if command -v redis-cli &> /dev/null; then
     redis-cli DEL "trait:categories" 2>/dev/null || echo "  (Redis not available or key doesn't exist)"
 else
