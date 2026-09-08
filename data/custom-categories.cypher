@@ -72,24 +72,31 @@ ON CREATE SET c.prefLabel = ['Travel@en'],
               c.enabled = true,
               c.itemCount = 0;
 
-// Social Style
-MERGE (c:Item:Category {uri: 'dating:category:social'})
-ON CREATE SET c.prefLabel = ['Social Style@en'],
-              c.description = ['How you prefer to socialize@en'],
+// Personality
+MERGE (c:Item:Category {uri: 'dating:category:personality'})
+ON CREATE SET c.prefLabel = ['Personality@en'],
+              c.description = ['Your personality type@en'],
               c.enabled = true,
               c.itemCount = 0;
 
-// Values
-MERGE (c:Item:Category {uri: 'dating:category:values'})
-ON CREATE SET c.prefLabel = ['Values@en'],
-              c.description = ['What matters to you@en'],
+// What I Value
+MERGE (c:Item:Category {uri: 'dating:category:what-i-value'})
+ON CREATE SET c.prefLabel = ['What I Value@en'],
+              c.description = ['What matters most to you@en'],
               c.enabled = true,
               c.itemCount = 0;
 
-// Lifestyle
-MERGE (c:Item:Category {uri: 'dating:category:lifestyle'})
-ON CREATE SET c.prefLabel = ['Lifestyle@en'],
-              c.description = ['How you live your life@en'],
+// Diet
+MERGE (c:Item:Category {uri: 'dating:category:diet'})
+ON CREATE SET c.prefLabel = ['Diet@en'],
+              c.description = ['Your dietary preferences@en'],
+              c.enabled = true,
+              c.itemCount = 0;
+
+// Cannabis
+MERGE (c:Item:Category {uri: 'dating:category:cannabis'})
+ON CREATE SET c.prefLabel = ['Cannabis@en'],
+              c.description = ['Your cannabis/marijuana use@en'],
               c.enabled = true,
               c.itemCount = 0;
 
@@ -266,6 +273,37 @@ MATCH (c:Category) WHERE c.uri IN [
 ]
 SET c.defaultRelation = 'HAS';
 
+// ============================================================
+// Set maxItems for categories (1 = single select, null = unlimited)
+// ============================================================
+
+// Single selection only
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:body-type',
+  'dating:category:height',
+  'dating:category:weight',
+  'dating:category:gender',
+  'dating:category:orientation',
+  'dating:category:smoking',
+  'dating:category:drinking',
+  'dating:category:zodiac',
+  'dating:category:relationship-status',
+  'dating:category:sleep',
+  'dating:category:education-level',
+  'dating:category:looking-for',
+  'dating:category:career'
+]
+SET c.maxItems = 1;
+
+// Allow a few selections
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:ethnicity',
+  'dating:category:hair-color',
+  'dating:category:eye-color',
+  'dating:category:religion'
+]
+SET c.maxItems = 3;
+
 // Field of study - STUDIES
 MATCH (c:Category {uri: 'dating:category:field-of-study'})
 SET c.defaultRelation = 'STUDIES';
@@ -293,10 +331,26 @@ SET c.defaultRelation = 'LIKES';
 MATCH (c:Category {uri: 'dating:category:entertainment'})
 SET c.defaultRelation = 'LIKES';
 
-// Values - always HAS
-MATCH (c:Category {uri: 'dating:category:values'})
+// What I Value - always HAS
+MATCH (c:Category {uri: 'dating:category:what-i-value'})
 SET c.defaultRelation = 'HAS';
 
-// Lifestyle - always HAS
-MATCH (c:Category {uri: 'dating:category:lifestyle'})
+// Personality - always HAS
+MATCH (c:Category {uri: 'dating:category:personality'})
 SET c.defaultRelation = 'HAS';
+
+// Diet - always HAS
+MATCH (c:Category {uri: 'dating:category:diet'})
+SET c.defaultRelation = 'HAS';
+
+// Cannabis - always HAS
+MATCH (c:Category {uri: 'dating:category:cannabis'})
+SET c.defaultRelation = 'HAS';
+
+// Single select for new categories
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:personality',
+  'dating:category:diet',
+  'dating:category:cannabis'
+]
+SET c.maxItems = 1;
