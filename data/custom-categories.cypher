@@ -356,3 +356,82 @@ MATCH (c:Category) WHERE c.uri IN [
   'dating:category:cannabis'
 ]
 SET c.maxItems = 1;
+
+// ============================================================
+// Category groups for organizing in UI
+// ============================================================
+
+// Physical Appearance
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:body-type',
+  'dating:category:height',
+  'dating:category:weight',
+  'dating:category:hair-color',
+  'dating:category:eye-color'
+]
+SET c.categoryGroup = 'Physical Appearance', c.groupOrder = 1;
+
+// Background
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:ethnicity',
+  'dating:category:religion',
+  'dating:category:zodiac'
+]
+SET c.categoryGroup = 'Background', c.groupOrder = 2;
+
+// Identity
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:gender',
+  'dating:category:orientation',
+  'dating:category:relationship-status',
+  'dating:category:looking-for'
+]
+SET c.categoryGroup = 'Identity & Dating', c.groupOrder = 3;
+
+// Lifestyle & Habits
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:smoking',
+  'dating:category:drinking',
+  'dating:category:cannabis',
+  'dating:category:diet',
+  'dating:category:sleep'
+]
+SET c.categoryGroup = 'Lifestyle & Habits', c.groupOrder = 4;
+
+// Work & Education
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:career',
+  'dating:category:education-level',
+  'dating:category:field-of-study',
+  'dating:category:languages'
+]
+SET c.categoryGroup = 'Work & Education', c.groupOrder = 5;
+
+// Personality & Values
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:personality',
+  'dating:category:what-i-value'
+]
+SET c.categoryGroup = 'Personality & Values', c.groupOrder = 6;
+
+// Interests & Hobbies
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:sports',
+  'dating:category:fitness',
+  'dating:category:outdoor-activities',
+  'dating:category:indoor-activities',
+  'dating:category:creative',
+  'dating:category:music',
+  'dating:category:entertainment',
+  'dating:category:food-drink',
+  'dating:category:travel',
+  'dating:category:pets'
+]
+SET c.categoryGroup = 'Interests & Hobbies', c.groupOrder = 7;
+
+// Home Life
+MATCH (c:Category) WHERE c.uri IN [
+  'dating:category:children',
+  'dating:category:household'
+]
+SET c.categoryGroup = 'Home Life', c.groupOrder = 8;
