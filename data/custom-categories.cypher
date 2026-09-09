@@ -259,6 +259,15 @@ ON CREATE SET c.prefLabel = ['Sleep Schedule@en'],
               c.enabled = true,
               c.itemCount = 0;
 
+// Freeform Tags (user-created)
+MERGE (c:Item:Category {uri: 'dating:category:tags'})
+ON CREATE SET c.prefLabel = ['Tags@en'],
+              c.description = ['Custom tags you create@en'],
+              c.enabled = true,
+              c.itemCount = 0,
+              c.freeform = true
+ON MATCH SET c.freeform = true;
+
 // ============================================================
 // Set default relations for categories where it's implicit
 // If defaultRelation is set, skip the relation dialog
@@ -454,3 +463,7 @@ MATCH (c:Category) WHERE c.uri IN [
   'dating:category:household'
 ]
 SET c.categoryGroup = 'Home Life', c.groupOrder = 8;
+
+// Custom Tags
+MATCH (c:Category {uri: 'dating:category:tags'})
+SET c.categoryGroup = 'Other', c.groupOrder = 99, c.defaultRelation = 'HAS';
