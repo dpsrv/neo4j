@@ -483,6 +483,25 @@ MERGE (i:Item {uri: 'dating:weight:over-220'})
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
+// SLIDER VALUE ITEMS (for storing exact numeric values)
+// These are placeholder items - the actual value is stored on the relationship
+// ============================================================
+MATCH (c:Category {uri: 'dating:category:height'})
+MERGE (i:Item {uri: 'dating:height:exact'})
+  ON CREATE SET i.prefLabel = ['Height@en'], i.isSliderValue = true
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:weight'})
+MERGE (i:Item {uri: 'dating:weight:exact'})
+  ON CREATE SET i.prefLabel = ['Weight@en'], i.isSliderValue = true
+MERGE (i)-[:P31]->(c);
+
+MATCH (c:Category {uri: 'dating:category:comfort-temp'})
+MERGE (i:Item {uri: 'dating:comfort-temp:exact'})
+  ON CREATE SET i.prefLabel = ['Comfort Temperature@en'], i.isSliderValue = true
+MERGE (i)-[:P31]->(c);
+
+// ============================================================
 // GENDER (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:gender'})

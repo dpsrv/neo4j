@@ -386,6 +386,34 @@ MATCH (c:Category) WHERE c.uri IN [
 SET c.defaultRelation = 'HAS';
 
 // ============================================================
+// Slider input categories (exact numeric values)
+// ============================================================
+
+// Height (in inches: 48" = 4ft, 84" = 7ft)
+MATCH (c:Category {uri: 'dating:category:height'})
+SET c.inputType = 'slider',
+    c.sliderMin = 48,
+    c.sliderMax = 84,
+    c.sliderStep = 1,
+    c.sliderUnit = 'in';
+
+// Weight (in lbs)
+MATCH (c:Category {uri: 'dating:category:weight'})
+SET c.inputType = 'slider',
+    c.sliderMin = 80,
+    c.sliderMax = 400,
+    c.sliderStep = 5,
+    c.sliderUnit = 'lbs';
+
+// Comfort Temperature (in °F)
+MATCH (c:Category {uri: 'dating:category:comfort-temp'})
+SET c.inputType = 'slider',
+    c.sliderMin = 60,
+    c.sliderMax = 80,
+    c.sliderStep = 1,
+    c.sliderUnit = '°F';
+
+// ============================================================
 // Category groups for organizing in UI
 // ============================================================
 
