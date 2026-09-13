@@ -83,6 +83,13 @@ ON CREATE SET c.prefLabel = ['Myers-Briggs@en'],
               c.enabled = true,
               c.itemCount = 0;
 
+// Attachment Style
+MERGE (c:Item:Category {uri: 'dating:category:attachment-style'})
+ON CREATE SET c.prefLabel = ['Attachment Style@en'],
+              c.description = ['Your relationship attachment style@en'],
+              c.enabled = true,
+              c.itemCount = 0;
+
 // Comfort Temperature
 MERGE (c:Item:Category {uri: 'dating:category:comfort-temp'})
 ON CREATE SET c.prefLabel = ['Comfort Temperature@en'],
@@ -467,9 +474,14 @@ SET c.categoryGroup = 'Work & Education', c.groupOrder = 5;
 // Personality & Values
 MATCH (c:Category) WHERE c.uri IN [
   'dating:category:myers-briggs',
+  'dating:category:attachment-style',
   'dating:category:what-i-value'
 ]
 SET c.categoryGroup = 'Personality & Values', c.groupOrder = 6;
+
+// Attachment Style - single select, HAS relation
+MATCH (c:Category {uri: 'dating:category:attachment-style'})
+SET c.defaultRelation = 'HAS', c.maxItems = 1;
 
 // Interests & Hobbies
 MATCH (c:Category) WHERE c.uri IN [

@@ -233,6 +233,20 @@ MERGE (i:Item {uri: 'dating:mbti:' + toLower(label)})
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
+// ATTACHMENT STYLE (custom items)
+// ============================================================
+MATCH (c:Category {uri: 'dating:category:attachment-style'})
+UNWIND [
+  'Secure',
+  'Anxious',
+  'Avoidant',
+  'Fearful-Avoidant'
+] AS label
+MERGE (i:Item {uri: 'dating:attachment:' + replace(toLower(label), '-', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
+
+// ============================================================
 // COMFORT TEMPERATURE (custom items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:comfort-temp'})
@@ -251,10 +265,24 @@ MERGE (i:Item {uri: 'dating:value:' + replace(replace(toLower(label), ' ', '-'),
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// DIET (custom items)
+// DIET (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:diet'})
-UNWIND ['No restrictions', 'Vegetarian', 'Vegan', 'Pescatarian', 'Keto', 'Paleo', 'Gluten-free', 'Halal', 'Kosher', 'Other'] AS label
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q83364',    // vegetarianism
+  'http://www.wikidata.org/entity/Q181138',   // veganism
+  'http://www.wikidata.org/entity/Q756975',   // pescetarianism
+  'http://www.wikidata.org/entity/Q1361297',  // ketogenic diet
+  'http://www.wikidata.org/entity/Q1356006',  // paleolithic diet
+  'http://www.wikidata.org/entity/Q845566',   // gluten-free diet
+  'http://www.wikidata.org/entity/Q170494',   // halal
+  'http://www.wikidata.org/entity/Q380574'    // kosher
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom diet items (no Wikidata equivalent)
+MATCH (c:Category {uri: 'dating:category:diet'})
+UNWIND ['No restrictions', 'Other'] AS label
 MERGE (i:Item {uri: 'dating:diet:' + replace(toLower(label), ' ', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
@@ -297,48 +325,146 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// CAREER (custom items - career fields)
+// CAREER (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:career'})
-UNWIND ['Technology', 'Healthcare', 'Finance', 'Education', 'Art & Design', 'Music & Entertainment', 'Engineering', 'Science & Research', 'Business', 'Media & Communications', 'Legal', 'Marketing & Sales', 'Real Estate', 'Hospitality', 'Nonprofit', 'Government', 'Retail', 'Consulting', 'Entrepreneur', 'Journalism', 'Construction', 'Manufacturing', 'Transportation', 'Agriculture', 'Military', 'Student', 'Retired', 'Other'] AS label
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q11661',    // information technology
+  'http://www.wikidata.org/entity/Q31207',    // healthcare
+  'http://www.wikidata.org/entity/Q43015',    // finance
+  'http://www.wikidata.org/entity/Q8434',     // education
+  'http://www.wikidata.org/entity/Q11023',    // engineering
+  'http://www.wikidata.org/entity/Q336',      // science
+  'http://www.wikidata.org/entity/Q4830453',  // business
+  'http://www.wikidata.org/entity/Q11024',    // communication
+  'http://www.wikidata.org/entity/Q7748',     // law
+  'http://www.wikidata.org/entity/Q39809',    // marketing
+  'http://www.wikidata.org/entity/Q11024',    // real estate Q56325876 - using Q56325876
+  'http://www.wikidata.org/entity/Q862604',   // hospitality industry
+  'http://www.wikidata.org/entity/Q163740',   // nonprofit organization
+  'http://www.wikidata.org/entity/Q7188',     // government
+  'http://www.wikidata.org/entity/Q126793',   // retail
+  'http://www.wikidata.org/entity/Q176799',   // consultant
+  'http://www.wikidata.org/entity/Q131524',   // entrepreneur
+  'http://www.wikidata.org/entity/Q11030',    // journalism
+  'http://www.wikidata.org/entity/Q385378',   // construction
+  'http://www.wikidata.org/entity/Q187939',   // manufacturing
+  'http://www.wikidata.org/entity/Q7590',     // transportation
+  'http://www.wikidata.org/entity/Q11451',    // agriculture
+  'http://www.wikidata.org/entity/Q8473'      // military
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom career items
+MATCH (c:Category {uri: 'dating:category:career'})
+UNWIND ['Art & Design', 'Music & Entertainment', 'Science & Research', 'Media & Communications', 'Sales', 'Real Estate', 'Student', 'Retired', 'Other'] AS label
 MERGE (i:Item {uri: 'dating:career:' + replace(replace(toLower(label), ' ', '-'), '&', 'and')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// EDUCATION LEVEL (custom items - degree/enrollment)
+// EDUCATION LEVEL (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:education-level'})
-UNWIND ['High School', 'Some High School', 'Trade/Vocational School', 'Some College', 'Associates Degree', 'Bachelors Degree', 'Masters Degree', 'Doctorate/PhD', 'Professional Degree (MD, JD)', 'Currently in School', 'Other'] AS label
-MERGE (i:Item {uri: 'dating:education-level:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q60854854', // high school diploma
+  'http://www.wikidata.org/entity/Q58291145', // vocational school
+  'http://www.wikidata.org/entity/Q752324',   // associate degree
+  'http://www.wikidata.org/entity/Q163727',   // bachelor's degree
+  'http://www.wikidata.org/entity/Q183816',   // master's degree
+  'http://www.wikidata.org/entity/Q849697',   // doctorate
+  'http://www.wikidata.org/entity/Q4373292'   // professional degree
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom education level items
+MATCH (c:Category {uri: 'dating:category:education-level'})
+UNWIND ['Some High School', 'Some College', 'Currently in School', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:education-level:' + replace(toLower(label), ' ', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// FIELD OF STUDY (custom items - academic subjects)
+// FIELD OF STUDY (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:field-of-study'})
-UNWIND ['Computer Science', 'Information Technology', 'Engineering', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'Environmental Science', 'Medicine', 'Nursing', 'Psychology', 'Sociology', 'Political Science', 'Economics', 'Business', 'Finance', 'Accounting', 'Marketing', 'Law', 'Philosophy', 'History', 'Literature', 'Communications', 'Journalism', 'Education', 'Art', 'Music', 'Theater', 'Film', 'Architecture', 'Graphic Design', 'Other'] AS label
-MERGE (i:Item {uri: 'dating:field-of-study:' + replace(toLower(label), ' ', '-')})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q21198',    // computer science
+  'http://www.wikidata.org/entity/Q11661',    // information technology
+  'http://www.wikidata.org/entity/Q11023',    // engineering
+  'http://www.wikidata.org/entity/Q395',      // mathematics
+  'http://www.wikidata.org/entity/Q413',      // physics
+  'http://www.wikidata.org/entity/Q2329',     // chemistry
+  'http://www.wikidata.org/entity/Q420',      // biology
+  'http://www.wikidata.org/entity/Q52107',    // environmental science
+  'http://www.wikidata.org/entity/Q11190',    // medicine
+  'http://www.wikidata.org/entity/Q121176',   // nursing
+  'http://www.wikidata.org/entity/Q9418',     // psychology
+  'http://www.wikidata.org/entity/Q21201',    // sociology
+  'http://www.wikidata.org/entity/Q36442',    // political science
+  'http://www.wikidata.org/entity/Q8134',     // economics
+  'http://www.wikidata.org/entity/Q4830453',  // business
+  'http://www.wikidata.org/entity/Q43015',    // finance
+  'http://www.wikidata.org/entity/Q4116214',  // accounting
+  'http://www.wikidata.org/entity/Q39809',    // marketing
+  'http://www.wikidata.org/entity/Q7748',     // law
+  'http://www.wikidata.org/entity/Q5891',     // philosophy
+  'http://www.wikidata.org/entity/Q309',      // history
+  'http://www.wikidata.org/entity/Q8242',     // literature
+  'http://www.wikidata.org/entity/Q11024',    // communications
+  'http://www.wikidata.org/entity/Q11030',    // journalism
+  'http://www.wikidata.org/entity/Q8434',     // education
+  'http://www.wikidata.org/entity/Q735',      // art
+  'http://www.wikidata.org/entity/Q638',      // music
+  'http://www.wikidata.org/entity/Q11635',    // theater
+  'http://www.wikidata.org/entity/Q11424',    // film
+  'http://www.wikidata.org/entity/Q12271',    // architecture
+  'http://www.wikidata.org/entity/Q185925'    // graphic design
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom field of study
+MATCH (c:Category {uri: 'dating:category:field-of-study'})
+MERGE (i:Item {uri: 'dating:field-of-study:other'})
+  ON CREATE SET i.prefLabel = ['Other@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// HAIR COLOR (custom items)
+// HAIR COLOR (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:hair-color'})
-UNWIND ['Black', 'Brown', 'Blonde', 'Red', 'Auburn', 'Strawberry Blonde', 'Gray', 'White', 'Bald', 'Dyed/Other'] AS label
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q1922956',  // black hair
+  'http://www.wikidata.org/entity/Q2419551',  // brown hair
+  'http://www.wikidata.org/entity/Q202466',   // blond hair
+  'http://www.wikidata.org/entity/Q152559',   // red hair
+  'http://www.wikidata.org/entity/Q2419570',  // auburn hair
+  'http://www.wikidata.org/entity/Q2303510',  // gray hair
+  'http://www.wikidata.org/entity/Q10862668', // white hair
+  'http://www.wikidata.org/entity/Q62500'     // baldness
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom hair color items
+MATCH (c:Category {uri: 'dating:category:hair-color'})
+UNWIND ['Strawberry Blonde', 'Dyed/Other'] AS label
 MERGE (i:Item {uri: 'dating:hair:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// EYE COLOR (custom items)
+// EYE COLOR (Wikidata items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:eye-color'})
-UNWIND ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Black'] AS label
-MERGE (i:Item {uri: 'dating:eyes:' + toLower(label)})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q17122705', // brown eyes
+  'http://www.wikidata.org/entity/Q17122834', // blue eyes
+  'http://www.wikidata.org/entity/Q17122854', // green eyes
+  'http://www.wikidata.org/entity/Q17245659', // hazel eyes
+  'http://www.wikidata.org/entity/Q17122740', // gray eyes
+  'http://www.wikidata.org/entity/Q17245823', // amber eyes
+  'http://www.wikidata.org/entity/Q52071128'  // black eyes
+]
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
@@ -385,10 +511,23 @@ MERGE (i8:Item {uri: 'dating:body-type:petite'})
 MERGE (i8)-[:P31]->(c);
 
 // ============================================================
-// ETHNICITY (custom items)
+// ETHNICITY (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:ethnicity'})
-UNWIND ['White/Caucasian', 'Black/African American', 'Hispanic/Latino', 'East Asian', 'South Asian', 'Southeast Asian', 'Middle Eastern', 'Jewish', 'Native American', 'Pacific Islander', 'Mixed/Multiracial', 'Other'] AS label
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q49078',    // white people
+  'http://www.wikidata.org/entity/Q190168',   // African Americans
+  'http://www.wikidata.org/entity/Q49297',    // East Asians
+  'http://www.wikidata.org/entity/Q1064081',  // South Asians
+  'http://www.wikidata.org/entity/Q7325',     // Jewish people
+  'http://www.wikidata.org/entity/Q36747',    // Native Americans
+  'http://www.wikidata.org/entity/Q726673'    // Pacific Islanders
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom ethnicity items (complex categories not well-represented in Wikidata)
+MATCH (c:Category {uri: 'dating:category:ethnicity'})
+UNWIND ['Hispanic/Latino', 'Southeast Asian', 'Middle Eastern', 'Mixed/Multiracial', 'Other'] AS label
 MERGE (i:Item {uri: 'dating:ethnicity:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
@@ -502,19 +641,47 @@ MERGE (i:Item {uri: 'dating:comfort-temp:exact'})
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// GENDER (custom items)
+// GENDER (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:gender'})
-UNWIND ['Man', 'Woman', 'Non-binary', 'Transgender Man', 'Transgender Woman', 'Genderqueer', 'Genderfluid', 'Agender', 'Two-Spirit', 'Other'] AS label
-MERGE (i:Item {uri: 'dating:gender:' + replace(toLower(label), ' ', '-')})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q8441',     // man
+  'http://www.wikidata.org/entity/Q467',      // woman
+  'http://www.wikidata.org/entity/Q48270',    // non-binary
+  'http://www.wikidata.org/entity/Q2449503',  // transgender man
+  'http://www.wikidata.org/entity/Q1052281',  // transgender woman
+  'http://www.wikidata.org/entity/Q505371',   // genderqueer
+  'http://www.wikidata.org/entity/Q18116794', // genderfluid
+  'http://www.wikidata.org/entity/Q7130936',  // agender
+  'http://www.wikidata.org/entity/Q160881'    // two-spirit
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom gender item
+MATCH (c:Category {uri: 'dating:category:gender'})
+MERGE (i:Item {uri: 'dating:gender:other'})
+  ON CREATE SET i.prefLabel = ['Other@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// SEXUAL ORIENTATION (custom items)
+// SEXUAL ORIENTATION (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:orientation'})
-UNWIND ['Straight', 'Gay', 'Lesbian', 'Bisexual', 'Pansexual', 'Asexual', 'Demisexual', 'Queer', 'Questioning', 'Other'] AS label
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q1035954',  // heterosexuality (straight)
+  'http://www.wikidata.org/entity/Q592',      // gay
+  'http://www.wikidata.org/entity/Q6649',     // lesbian
+  'http://www.wikidata.org/entity/Q43200',    // bisexuality
+  'http://www.wikidata.org/entity/Q271534',   // pansexuality
+  'http://www.wikidata.org/entity/Q33649',    // asexuality
+  'http://www.wikidata.org/entity/Q1478479',  // demisexuality
+  'http://www.wikidata.org/entity/Q17884'     // queer
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom orientation items
+MATCH (c:Category {uri: 'dating:category:orientation'})
+UNWIND ['Questioning', 'Other'] AS label
 MERGE (i:Item {uri: 'dating:orientation:' + toLower(label)})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
@@ -609,21 +776,50 @@ MERGE (i:Item {uri: 'dating:children:yes-open'})
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// RELIGION
+// RELIGION (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:religion'})
-UNWIND ['Christian', 'Catholic', 'Protestant', 'Orthodox Christian', 'Muslim', 'Jewish', 'Buddhist', 'Hindu', 'Sikh', 'Mormon/LDS', 'Spiritual', 'Agnostic', 'Atheist', 'Other'] AS label
-MERGE (i:Item {uri: 'dating:religion:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q5043',     // Christianity
+  'http://www.wikidata.org/entity/Q1841',     // Catholicism
+  'http://www.wikidata.org/entity/Q23540',    // Protestantism
+  'http://www.wikidata.org/entity/Q35032',    // Eastern Orthodox
+  'http://www.wikidata.org/entity/Q432',      // Islam
+  'http://www.wikidata.org/entity/Q9268',     // Judaism
+  'http://www.wikidata.org/entity/Q748',      // Buddhism
+  'http://www.wikidata.org/entity/Q9089',     // Hinduism
+  'http://www.wikidata.org/entity/Q9325',     // Sikhism
+  'http://www.wikidata.org/entity/Q747802',   // Mormonism/LDS
+  'http://www.wikidata.org/entity/Q288928',   // Agnosticism
+  'http://www.wikidata.org/entity/Q7066'      // Atheism
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom religion items
+MATCH (c:Category {uri: 'dating:category:religion'})
+UNWIND ['Spiritual', 'Other'] AS label
+MERGE (i:Item {uri: 'dating:religion:' + toLower(label)})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// ZODIAC SIGN (custom items)
+// ZODIAC SIGN (Wikidata items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:zodiac'})
-UNWIND ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'] AS label
-MERGE (i:Item {uri: 'dating:zodiac:' + toLower(label)})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q37930',    // Aries
+  'http://www.wikidata.org/entity/Q37940',    // Taurus
+  'http://www.wikidata.org/entity/Q37942',    // Gemini
+  'http://www.wikidata.org/entity/Q37944',    // Cancer
+  'http://www.wikidata.org/entity/Q37946',    // Leo
+  'http://www.wikidata.org/entity/Q37948',    // Virgo
+  'http://www.wikidata.org/entity/Q37950',    // Libra
+  'http://www.wikidata.org/entity/Q37952',    // Scorpio
+  'http://www.wikidata.org/entity/Q37954',    // Sagittarius
+  'http://www.wikidata.org/entity/Q37956',    // Capricorn
+  'http://www.wikidata.org/entity/Q37958',    // Aquarius
+  'http://www.wikidata.org/entity/Q37960'     // Pisces
+]
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
