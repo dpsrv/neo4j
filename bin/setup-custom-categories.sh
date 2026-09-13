@@ -37,10 +37,10 @@ CYPHER
 
 echo ""
 echo "Step 5: Clearing Redis cache..."
-if command -v redis-cli &> /dev/null; then
-    redis-cli DEL "trait:categories" 2>/dev/null || echo "  (Redis not available or key doesn't exist)"
+if command -v kubectl &> /dev/null; then
+    kubectl -n dpsrv exec redis-0 -c redis -- redis-cli DEL "trait:categories" 2>/dev/null || echo "  (Redis not available or key doesn't exist)"
 else
-    echo "  redis-cli not found - manually clear 'trait:categories' key if using Redis"
+    echo "  kubectl not found - manually clear 'trait:categories' key"
 fi
 
 echo ""
