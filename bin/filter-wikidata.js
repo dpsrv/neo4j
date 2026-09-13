@@ -25,7 +25,7 @@ const P31 = `<${WDT}P31>`;
 const P279 = `<${WDT}P279>`;
 
 const KEEP_INSTANCE_TYPES = new Set([
-  // Geographic
+  // Geographic (original - needed for location features)
   `<${WD}Q515>`,      // city
   `<${WD}Q6256>`,     // country
   `<${WD}Q3624078>`,  // sovereign state
@@ -38,99 +38,47 @@ const KEEP_INSTANCE_TYPES = new Set([
   `<${WD}Q3957>`,     // town
   `<${WD}Q486972>`,   // human settlement
 
-  // Languages
+  // Languages (original)
   `<${WD}Q34770>`,    // language
   `<${WD}Q33742>`,    // natural language
   `<${WD}Q1288568>`,  // modern language
 
-  // Religion
-  `<${WD}Q9174>`,     // religion
-  `<${WD}Q13414953>`, // religious denomination
-  `<${WD}Q879146>`,   // Christian denomination
-  `<${WD}Q3220391>`,  // world view (agnosticism, atheism)
+  // === DATING PROFILE SPECIFIC (small bounded sets) ===
 
-  // Zodiac/Astrology
+  // Zodiac signs (~12 items)
   `<${WD}Q1047539>`,  // astrological sign
   `<${WD}Q192880>`,   // western astrological sign
 
-  // Personality
+  // MBTI types (~16 items)
   `<${WD}Q484876>`,   // Myers-Briggs type
+
+  // Attachment styles (~4 items)
   `<${WD}Q7988703>`,  // attachment style
-  `<${WD}Q844569>`,   // personality type
 
-  // Gender & Sexuality
+  // Gender identity (~10 items)
   `<${WD}Q48264>`,    // gender identity
-  `<${WD}Q17884>`,    // sexual orientation (also an instance)
-  `<${WD}Q290>`,      // sex (male/female)
 
-  // Physical characteristics
+  // Sexual orientation (~10 items)
+  `<${WD}Q17884>`,    // sexual orientation
+
+  // Hair color (~10 items)
   `<${WD}Q1922956>`,  // human hair color
-  `<${WD}Q17245823>`, // human eye color
-  `<${WD}Q15134695>`, // body shape
 
-  // Relationship
+  // Eye color (~8 items)
+  `<${WD}Q17122705>`, // human eye color
+
+  // Marital/relationship status (~7 items)
   `<${WD}Q3882219>`,  // marital status
-  `<${WD}Q3882233>`,  // relationship status
 
-  // Diet & Lifestyle
-  `<${WD}Q179122>`,   // diet (nutrition)
-  `<${WD}Q62511>`,    // lifestyle
-
-  // Education
+  // Academic degrees (~10 items)
   `<${WD}Q189533>`,   // academic degree
-  `<${WD}Q11862829>`, // academic discipline
-  `<${WD}Q336>`,      // science
-  `<${WD}Q34178>`,    // humanities
-  `<${WD}Q8434>`,     // education (field)
 
-  // Occupation/Career
-  `<${WD}Q28640>`,    // profession
-  `<${WD}Q12737077>`, // occupation
-  `<${WD}Q268592>`,   // industry
+  // Religions (~20 items) - major world religions
+  `<${WD}Q9174>`,     // religion
+  `<${WD}Q13414953>`, // religious denomination
 
-  // Sports & Fitness
-  `<${WD}Q349>`,      // sport
-  `<${WD}Q31629>`,    // type of sport
-  `<${WD}Q476028>`,   // team sport
-  `<${WD}Q2312410>`,  // individual sport
-  `<${WD}Q223832>`,   // martial art
-  `<${WD}Q61065>`,    // fitness activity
-
-  // Music
-  `<${WD}Q188451>`,   // music genre
-  `<${WD}Q34379>`,    // musical instrument
-
-  // Entertainment
-  `<${WD}Q201658>`,   // film genre
-  `<${WD}Q15961987>`, // television genre
-  `<${WD}Q659563>`,   // video game genre
-  `<${WD}Q21198342>`, // podcast genre
-
-  // Food & Cuisine
-  `<${WD}Q1778821>`,  // cuisine
-  `<${WD}Q746549>`,   // dish (food)
-
-  // Hobbies & Activities
-  `<${WD}Q47728>`,    // hobby
-  `<${WD}Q1914636>`,  // activity
-  `<${WD}Q11410>`,    // game
-  `<${WD}Q131436>`,   // board game
-  `<${WD}Q4026292>`,  // outdoor activity
-  `<${WD}Q3134219>`,  // indoor activity
-  `<${WD}Q17537576>`, // creative work type
-
-  // Pets & Animals
-  `<${WD}Q16521>`,    // taxon (for pet species)
-  `<${WD}Q729>`,      // animal
-  `<${WD}Q39201>`,    // pet
-
-  // Travel
-  `<${WD}Q1194747>`,  // type of tourism
-
-  // Values & Traits
-  `<${WD}Q169872>`,   // virtue
-  `<${WD}Q9332>`,     // human behavior
-  `<${WD}Q60539479>`, // personal value
+  // Diet types (~10 items)
+  `<${WD}Q179122>`,   // diet (nutrition)
 ]);
 
 const startTime = Date.now();
