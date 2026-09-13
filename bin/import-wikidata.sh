@@ -89,9 +89,15 @@ cypher "CALL n10s.graphconfig.drop();" || true
 cypher "CREATE CONSTRAINT n10s_unique_uri IF NOT EXISTS FOR (r:Resource) REQUIRE r.uri IS UNIQUE;"
 cypher "CALL n10s.graphconfig.init({ handleVocabUris: 'MAP', handleMultival: 'ARRAY', keepLangTag: true, keepCustomDataTypes: false });"
 
-if kubectl exec -n dpsrv "$POD" -- test -f /var/lib/neo4j/import/truthy.nt.gz 2>/dev/null; then
-  log "Dump file already exists on pod, skipping copy"
+LOCAL_SIZE=$(stat -f%z "$DUMP_FILE" 2>/dev/null || stat -c%s "$DUMP_FILE" 2>/dev/null)
+REMOTE_SIZE=$(kubectl exec -n dpsrv "$POD" -- stat -c%s /var/lib/neo4j/import/truthy.nt.gz 2>/dev/null || echo "0")
+
+if [ "$LOCAL_SIZE" = "$REMOTE_SIZE" ] && [ "$REMOTE_SIZE" != "0" ]; then
+  log "Dump file already exists on pod with same size ($REMOTE_SIZE bytes), skipping copy"
 else
+  if [ "$REMOTE_SIZE" != "0" ]; then
+    log "Dump file size differs (local: $LOCAL_SIZE, remote: $REMOTE_SIZE), replacing"
+  fi
   log "Copying dump file to pod ($(du -h "$DUMP_FILE" | cut -f1))"
   kubectl cp "$DUMP_FILE" "dpsrv/$POD:/var/lib/neo4j/import/truthy.nt.gz"
   log "Copy complete"
