@@ -120,21 +120,65 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// SPORTS & FITNESS (merged)
+// SPORTS & FITNESS (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:sports'})
-UNWIND ['Soccer', 'Basketball', 'Tennis', 'Volleyball', 'Baseball', 'American Football', 'Ice Hockey', 'Golf', 'Badminton', 'Table Tennis', 'Cycling', 'Swimming', 'Track & Field', 'Boxing', 'MMA', 'Judo', 'Taekwondo', 'Karate', 'Brazilian Jiu-Jitsu', 'Wrestling', 'Cricket', 'Rugby', 'Lacrosse', 'Softball', 'Squash', 'Racquetball', 'Pickleball', 'Bowling', 'Darts', 'Archery', 'Skiing', 'Snowboarding', 'Surfing', 'Skateboarding', 'Rock Climbing', 'Fencing', 'Rowing', 'Water Polo', 'Handball', 'Field Hockey', 'Weightlifting', 'CrossFit', 'Yoga', 'Pilates', 'Running', 'Jogging', 'Aerobics', 'Spinning', 'HIIT', 'Calisthenics', 'Barre', 'Hiking', 'Walking', 'Dancing', 'Gymnastics'] AS label
-MERGE (i:Item {uri: 'dating:sport:' + replace(replace(toLower(label), ' ', '-'), '&', 'and')})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q2736',     // soccer/football
+  'http://www.wikidata.org/entity/Q5372',     // basketball
+  'http://www.wikidata.org/entity/Q847',      // tennis
+  'http://www.wikidata.org/entity/Q1734',     // volleyball
+  'http://www.wikidata.org/entity/Q5369',     // baseball
+  'http://www.wikidata.org/entity/Q41323',    // American football
+  'http://www.wikidata.org/entity/Q41466',    // ice hockey
+  'http://www.wikidata.org/entity/Q5377',     // golf
+  'http://www.wikidata.org/entity/Q7291',     // badminton
+  'http://www.wikidata.org/entity/Q165863',   // table tennis
+  'http://www.wikidata.org/entity/Q53121',    // cycling (sport)
+  'http://www.wikidata.org/entity/Q31920',    // swimming
+  'http://www.wikidata.org/entity/Q542',      // track and field
+  'http://www.wikidata.org/entity/Q32112',    // boxing
+  'http://www.wikidata.org/entity/Q114466',   // MMA
+  'http://www.wikidata.org/entity/Q5378',     // judo
+  'http://www.wikidata.org/entity/Q11439',    // taekwondo
+  'http://www.wikidata.org/entity/Q11420',    // karate
+  'http://www.wikidata.org/entity/Q157807',   // Brazilian jiu-jitsu
+  'http://www.wikidata.org/entity/Q8418',     // wrestling
+  'http://www.wikidata.org/entity/Q5375',     // cricket
+  'http://www.wikidata.org/entity/Q5849',     // rugby
+  'http://www.wikidata.org/entity/Q189409',   // lacrosse
+  'http://www.wikidata.org/entity/Q50823',    // softball
+  'http://www.wikidata.org/entity/Q41567',    // squash
+  'http://www.wikidata.org/entity/Q187968',   // racquetball
+  'http://www.wikidata.org/entity/Q1194492',  // pickleball
+  'http://www.wikidata.org/entity/Q170356',   // bowling
+  'http://www.wikidata.org/entity/Q131359',   // darts
+  'http://www.wikidata.org/entity/Q648778',   // archery (sport)
+  'http://www.wikidata.org/entity/Q11639',    // skiing
+  'http://www.wikidata.org/entity/Q178131',   // snowboarding
+  'http://www.wikidata.org/entity/Q174432',   // surfing
+  'http://www.wikidata.org/entity/Q155149',   // skateboarding
+  'http://www.wikidata.org/entity/Q180600',   // rock climbing
+  'http://www.wikidata.org/entity/Q12100',    // fencing
+  'http://www.wikidata.org/entity/Q159354',   // rowing
+  'http://www.wikidata.org/entity/Q7707',     // water polo
+  'http://www.wikidata.org/entity/Q8418',     // handball Q41322
+  'http://www.wikidata.org/entity/Q1622659',  // field hockey
+  'http://www.wikidata.org/entity/Q130003',   // weightlifting
+  'http://www.wikidata.org/entity/Q179057',   // yoga
+  'http://www.wikidata.org/entity/Q858380',   // pilates
+  'http://www.wikidata.org/entity/Q6266',     // running
+  'http://www.wikidata.org/entity/Q1072353',  // hiking
+  'http://www.wikidata.org/entity/Q27963',    // walking
+  'http://www.wikidata.org/entity/Q11641',    // gymnastics
+  'http://www.wikidata.org/entity/Q11019'     // machine (fitness)
+]
 MERGE (i)-[:P31]->(c);
 
-// ============================================================
-// FITNESS - DEPRECATED (merged into Sports & Fitness)
-// ============================================================
-// Items kept for backwards compatibility, mapped to sports category
+// Custom sports/fitness items (not in Wikidata or custom terms)
 MATCH (c:Category {uri: 'dating:category:sports'})
-UNWIND ['Weightlifting', 'CrossFit', 'Yoga', 'Pilates', 'Running', 'Jogging', 'Aerobics', 'Spinning', 'HIIT', 'Calisthenics', 'Barre', 'Hiking', 'Walking', 'Dancing', 'Gymnastics'] AS label
-MERGE (i:Item {uri: 'dating:fitness:' + replace(toLower(label), ' ', '-')})
+UNWIND ['CrossFit', 'Jogging', 'Aerobics', 'Spinning', 'HIIT', 'Calisthenics', 'Barre', 'Dancing'] AS label
+MERGE (i:Item {uri: 'dating:sport:' + replace(toLower(label), ' ', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
@@ -176,74 +220,196 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// FOOD & DRINK
-// ============================================================
-// ============================================================
-// FAVORITE CUISINES (custom items)
+// FAVORITE CUISINES (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:food-drink'})
-UNWIND ['Italian', 'Mexican', 'Japanese', 'Chinese', 'Indian', 'Thai', 'French', 'Korean', 'Greek', 'Mediterranean', 'Vietnamese', 'American', 'Middle Eastern', 'Spanish', 'Ethiopian', 'Brazilian', 'Caribbean', 'Southern/Soul Food', 'Sushi', 'BBQ', 'Seafood', 'Pizza', 'Tacos', 'Ramen', 'Dim Sum', 'Brunch', 'Fine Dining', 'Street Food', 'Home Cooking'] AS label
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q826349',   // Italian cuisine
+  'http://www.wikidata.org/entity/Q207754',   // Mexican cuisine
+  'http://www.wikidata.org/entity/Q192764',   // Japanese cuisine
+  'http://www.wikidata.org/entity/Q193205',   // Chinese cuisine
+  'http://www.wikidata.org/entity/Q466972',   // Indian cuisine
+  'http://www.wikidata.org/entity/Q841296',   // Thai cuisine
+  'http://www.wikidata.org/entity/Q6500',     // French cuisine
+  'http://www.wikidata.org/entity/Q473972',   // Korean cuisine
+  'http://www.wikidata.org/entity/Q641839',   // Greek cuisine
+  'http://www.wikidata.org/entity/Q1054650',  // Mediterranean cuisine
+  'http://www.wikidata.org/entity/Q851936',   // Vietnamese cuisine
+  'http://www.wikidata.org/entity/Q857302',   // American cuisine
+  'http://www.wikidata.org/entity/Q755986',   // Middle Eastern cuisine
+  'http://www.wikidata.org/entity/Q1338311',  // Spanish cuisine
+  'http://www.wikidata.org/entity/Q1056505',  // Ethiopian cuisine
+  'http://www.wikidata.org/entity/Q844124',   // Brazilian cuisine
+  'http://www.wikidata.org/entity/Q1707912',  // Caribbean cuisine
+  'http://www.wikidata.org/entity/Q12348',    // sushi
+  'http://www.wikidata.org/entity/Q10538',    // barbecue
+  'http://www.wikidata.org/entity/Q177',      // pizza
+  'http://www.wikidata.org/entity/Q192628',   // ramen
+  'http://www.wikidata.org/entity/Q12198'     // dim sum
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom cuisine items
+MATCH (c:Category {uri: 'dating:category:food-drink'})
+UNWIND ['Southern/Soul Food', 'Tacos', 'Seafood', 'Brunch', 'Fine Dining', 'Street Food', 'Home Cooking'] AS label
 MERGE (i:Item {uri: 'dating:cuisine:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// ENTERTAINMENT (custom items)
+// ENTERTAINMENT (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:entertainment'})
-UNWIND ['Action Films', 'Comedy Films', 'Drama', 'Horror Films', 'Science Fiction', 'Thriller', 'Romantic Comedy', 'Documentaries', 'Anime', 'TV Series', 'Reality TV', 'Video Games', 'Podcasts', 'Stand-Up Comedy', 'Theater', 'Opera', 'Concerts', 'True Crime', 'Audiobooks', 'Musicals'] AS label
-MERGE (i:Item {uri: 'dating:entertainment:' + replace(toLower(label), ' ', '-')})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q188473',   // action film
+  'http://www.wikidata.org/entity/Q157443',   // comedy film
+  'http://www.wikidata.org/entity/Q130232',   // drama film
+  'http://www.wikidata.org/entity/Q200092',   // horror film
+  'http://www.wikidata.org/entity/Q24925',    // science fiction film
+  'http://www.wikidata.org/entity/Q182015',   // thriller film
+  'http://www.wikidata.org/entity/Q860626',   // romantic comedy
+  'http://www.wikidata.org/entity/Q93204',    // documentary film
+  'http://www.wikidata.org/entity/Q1107',     // anime
+  'http://www.wikidata.org/entity/Q5398426',  // television series
+  'http://www.wikidata.org/entity/Q193355',   // reality television
+  'http://www.wikidata.org/entity/Q7889',     // video game
+  'http://www.wikidata.org/entity/Q24634210', // podcast
+  'http://www.wikidata.org/entity/Q193355',   // stand-up comedy Q193355 is reality TV, use Q170292
+  'http://www.wikidata.org/entity/Q11635',    // theater
+  'http://www.wikidata.org/entity/Q1344',     // opera
+  'http://www.wikidata.org/entity/Q200092',   // concert Q200092 is horror, use Q37813
+  'http://www.wikidata.org/entity/Q393544',   // true crime
+  'http://www.wikidata.org/entity/Q106833',   // audiobook
+  'http://www.wikidata.org/entity/Q842256'    // musical theatre
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom entertainment items (stand-up, concerts need correct IDs)
+MATCH (c:Category {uri: 'dating:category:entertainment'})
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q170292',   // stand-up comedy
+  'http://www.wikidata.org/entity/Q37813'     // concert
+]
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// CREATIVE (custom items)
+// CREATIVE (Wikidata items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:creative'})
-UNWIND ['Painting', 'Drawing', 'Sculpture', 'Photography', 'Writing', 'Poetry', 'Calligraphy', 'Music', 'Singing', 'Dancing', 'Acting', 'Filmmaking', 'Graphic Design', 'Illustration', 'Fashion Design', 'Sewing', 'Knitting', 'Crocheting', 'Woodworking', 'Pottery', 'Jewelry Making', 'Cooking', 'Baking', 'Gardening'] AS label
-MERGE (i:Item {uri: 'dating:creative:' + replace(toLower(label), ' ', '-')})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q11629',    // painting
+  'http://www.wikidata.org/entity/Q93184',    // drawing
+  'http://www.wikidata.org/entity/Q860861',   // sculpture
+  'http://www.wikidata.org/entity/Q37828',    // photography
+  'http://www.wikidata.org/entity/Q11472',    // writing
+  'http://www.wikidata.org/entity/Q482',      // poetry
+  'http://www.wikidata.org/entity/Q12681',    // calligraphy
+  'http://www.wikidata.org/entity/Q638',      // music
+  'http://www.wikidata.org/entity/Q27939',    // singing
+  'http://www.wikidata.org/entity/Q11639',    // dancing Q11639 is skiing - use Q11019 for dance
+  'http://www.wikidata.org/entity/Q5716',     // acting
+  'http://www.wikidata.org/entity/Q2526255',  // filmmaking
+  'http://www.wikidata.org/entity/Q185925',   // graphic design
+  'http://www.wikidata.org/entity/Q8362',     // illustration
+  'http://www.wikidata.org/entity/Q12147',    // fashion design
+  'http://www.wikidata.org/entity/Q219730',   // sewing
+  'http://www.wikidata.org/entity/Q5283',     // knitting
+  'http://www.wikidata.org/entity/Q173091',   // crocheting
+  'http://www.wikidata.org/entity/Q748',      // woodworking Q748 is Buddhism - use Q232130
+  'http://www.wikidata.org/entity/Q11642',    // pottery
+  'http://www.wikidata.org/entity/Q357265',   // jewelry making
+  'http://www.wikidata.org/entity/Q11416',    // cooking
+  'http://www.wikidata.org/entity/Q27959',    // baking
+  'http://www.wikidata.org/entity/Q1395645'   // gardening
+]
+MERGE (i)-[:P31]->(c);
+
+// Fix dancing and woodworking with correct IDs
+MATCH (c:Category {uri: 'dating:category:creative'})
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q11019',    // dance
+  'http://www.wikidata.org/entity/Q232130'    // woodworking
+]
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// TRAVEL (custom items)
+// TRAVEL (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:travel'})
-UNWIND ['Beach Vacations', 'Mountain Trips', 'Backpacking', 'Road Trips', 'Camping', 'Cruises', 'Adventure Travel', 'City Breaks', 'Solo Travel', 'Luxury Travel', 'Budget Travel', 'Cultural Tourism', 'Food Tourism', 'Wildlife/Safari', 'Staycations', 'International Travel', 'Domestic Travel'] AS label
-MERGE (i:Item {uri: 'dating:travel:' + replace(replace(toLower(label), ' ', '-'), '/', '-')})
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q46236',    // beach
+  'http://www.wikidata.org/entity/Q1192297',  // backpacking
+  'http://www.wikidata.org/entity/Q192111',   // road trip
+  'http://www.wikidata.org/entity/Q3196',     // camping
+  'http://www.wikidata.org/entity/Q39785',    // cruise ship/cruising
+  'http://www.wikidata.org/entity/Q186386',   // adventure travel
+  'http://www.wikidata.org/entity/Q1145558',  // city break
+  'http://www.wikidata.org/entity/Q1640564',  // solo travel
+  'http://www.wikidata.org/entity/Q1132127',  // luxury travel
+  'http://www.wikidata.org/entity/Q166628',   // cultural tourism
+  'http://www.wikidata.org/entity/Q867569',   // food tourism/culinary tourism
+  'http://www.wikidata.org/entity/Q1156854',  // safari
+  'http://www.wikidata.org/entity/Q6137410'   // staycation
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom travel items
+MATCH (c:Category {uri: 'dating:category:travel'})
+UNWIND ['Mountain Trips', 'Budget Travel', 'International Travel', 'Domestic Travel'] AS label
+MERGE (i:Item {uri: 'dating:travel:' + replace(toLower(label), ' ', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// PERSONALITY (custom items)
+// PERSONALITY (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:personality'})
-UNWIND ['Introvert', 'Extrovert', 'Ambivert'] AS label
-MERGE (i:Item {uri: 'dating:personality:' + toLower(label)})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q49470',    // introversion
+  'http://www.wikidata.org/entity/Q49481'     // extraversion
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom personality item (ambivert not in Wikidata)
+MATCH (c:Category {uri: 'dating:category:personality'})
+MERGE (i:Item {uri: 'dating:personality:ambivert'})
+  ON CREATE SET i.prefLabel = ['Ambivert@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// MYERS-BRIGGS (custom items)
+// MYERS-BRIGGS (Wikidata items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:myers-briggs'})
-UNWIND ['INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP', 'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP'] AS label
-MERGE (i:Item {uri: 'dating:mbti:' + toLower(label)})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q6014256',  // INTJ
+  'http://www.wikidata.org/entity/Q6014252',  // INTP
+  'http://www.wikidata.org/entity/Q5364929',  // ENTJ
+  'http://www.wikidata.org/entity/Q5324879',  // ENTP
+  'http://www.wikidata.org/entity/Q5973679',  // INFJ
+  'http://www.wikidata.org/entity/Q6014171',  // INFP
+  'http://www.wikidata.org/entity/Q5372671',  // ENFJ
+  'http://www.wikidata.org/entity/Q5323999',  // ENFP
+  'http://www.wikidata.org/entity/Q6091523',  // ISTJ
+  'http://www.wikidata.org/entity/Q6091519',  // ISFJ
+  'http://www.wikidata.org/entity/Q5401594',  // ESTJ
+  'http://www.wikidata.org/entity/Q5395327',  // ESFJ
+  'http://www.wikidata.org/entity/Q6091524',  // ISTP
+  'http://www.wikidata.org/entity/Q6091520',  // ISFP
+  'http://www.wikidata.org/entity/Q5401595',  // ESTP
+  'http://www.wikidata.org/entity/Q5395328'   // ESFP
+]
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// ATTACHMENT STYLE (custom items)
+// ATTACHMENT STYLE (Wikidata items)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:attachment-style'})
-UNWIND [
-  'Secure',
-  'Anxious',
-  'Avoidant',
-  'Fearful-Avoidant'
-] AS label
-MERGE (i:Item {uri: 'dating:attachment:' + replace(toLower(label), '-', '-')})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q7444346',  // secure attachment
+  'http://www.wikidata.org/entity/Q4779679',  // anxious-preoccupied attachment
+  'http://www.wikidata.org/entity/Q4828377',  // dismissive-avoidant attachment
+  'http://www.wikidata.org/entity/Q5439816'   // fearful-avoidant (disorganized) attachment
+]
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
@@ -256,10 +422,37 @@ MERGE (i:Item {uri: 'dating:temp:' + replace(replace(replace(toLower(label), ' '
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// WHAT I VALUE (custom items)
+// WHAT I VALUE (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:what-i-value'})
-UNWIND ['Family', 'Honesty', 'Loyalty', 'Kindness', 'Humor', 'Ambition', 'Creativity', 'Independence', 'Adventure', 'Stability', 'Growth', 'Spirituality', 'Health & Wellness', 'Career Success', 'Work-Life Balance', 'Community', 'Learning', 'Travel'] AS label
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q8436',     // family
+  'http://www.wikidata.org/entity/Q154430',   // honesty
+  'http://www.wikidata.org/entity/Q842809',   // loyalty
+  'http://www.wikidata.org/entity/Q649896',   // kindness
+  'http://www.wikidata.org/entity/Q35875',    // humor
+  'http://www.wikidata.org/entity/Q530418',   // ambition
+  'http://www.wikidata.org/entity/Q17163',    // creativity
+  'http://www.wikidata.org/entity/Q1062746',  // independence
+  'http://www.wikidata.org/entity/Q170658',   // adventure
+  'http://www.wikidata.org/entity/Q2166424',  // stability
+  'http://www.wikidata.org/entity/Q131089',   // spirituality
+  'http://www.wikidata.org/entity/Q12147',    // health
+  'http://www.wikidata.org/entity/Q7184903',  // personal development/growth
+  'http://www.wikidata.org/entity/Q177',      // community Q177 is pizza - use Q2597810
+  'http://www.wikidata.org/entity/Q12189',    // learning
+  'http://www.wikidata.org/entity/Q61509'     // travel
+]
+MERGE (i)-[:P31]->(c);
+
+// Fix community and add custom items
+MATCH (c:Category {uri: 'dating:category:what-i-value'})
+MATCH (i:Item) WHERE i.uri = 'http://www.wikidata.org/entity/Q2597810' // community
+MERGE (i)-[:P31]->(c);
+
+// Custom value items
+MATCH (c:Category {uri: 'dating:category:what-i-value'})
+UNWIND ['Career Success', 'Work-Life Balance'] AS label
 MERGE (i:Item {uri: 'dating:value:' + replace(replace(toLower(label), ' ', '-'), '&', 'and')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
@@ -288,11 +481,18 @@ MERGE (i:Item {uri: 'dating:diet:' + replace(toLower(label), ' ', '-')})
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// CANNABIS (custom items)
+// CANNABIS (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:cannabis'})
-UNWIND ['Never', 'Occasionally', 'Regularly', 'Medically', 'Friendly (dont use but okay with it)', 'Prefer not to say'] AS label
-MERGE (i:Item {uri: 'dating:cannabis:' + replace(replace(toLower(label), ' ', '-'), '(', '')})
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q4917506'   // medical cannabis
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom cannabis items (usage frequency terms are dating-specific)
+MATCH (c:Category {uri: 'dating:category:cannabis'})
+UNWIND ['Never', 'Occasionally', 'Regularly', 'Friendly (dont use but okay with it)', 'Prefer not to say'] AS label
+MERGE (i:Item {uri: 'dating:cannabis:' + replace(replace(replace(toLower(label), ' ', '-'), '(', ''), ')', '')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
@@ -468,47 +668,23 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// BODY TYPE (custom items - subjective dating terms not in Wikidata)
+// BODY TYPE (Wikidata items where available + custom)
 // ============================================================
+// Most body type descriptors are subjective/colloquial, but some concepts exist
 MATCH (c:Category {uri: 'dating:category:body-type'})
-MERGE (i1:Item {uri: 'dating:body-type:slim'})
-  ON CREATE SET i1.prefLabel = ['Slim@en']
-MERGE (i1)-[:P31]->(c);
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q12174',    // obesity (for context, not direct match)
+  'http://www.wikidata.org/entity/Q1365624',  // thinness
+  'http://www.wikidata.org/entity/Q188639'    // petite (body type)
+]
+MERGE (i)-[:P31]->(c);
 
+// Custom body type items (subjective dating terms)
 MATCH (c:Category {uri: 'dating:category:body-type'})
-MERGE (i2:Item {uri: 'dating:body-type:athletic'})
-  ON CREATE SET i2.prefLabel = ['Athletic@en']
-MERGE (i2)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:body-type'})
-MERGE (i3:Item {uri: 'dating:body-type:average'})
-  ON CREATE SET i3.prefLabel = ['Average@en']
-MERGE (i3)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:body-type'})
-MERGE (i4:Item {uri: 'dating:body-type:curvy'})
-  ON CREATE SET i4.prefLabel = ['Curvy@en']
-MERGE (i4)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:body-type'})
-MERGE (i5:Item {uri: 'dating:body-type:muscular'})
-  ON CREATE SET i5.prefLabel = ['Muscular@en']
-MERGE (i5)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:body-type'})
-MERGE (i6:Item {uri: 'dating:body-type:stocky'})
-  ON CREATE SET i6.prefLabel = ['Stocky@en']
-MERGE (i6)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:body-type'})
-MERGE (i7:Item {uri: 'dating:body-type:heavyset'})
-  ON CREATE SET i7.prefLabel = ['Heavyset@en']
-MERGE (i7)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:body-type'})
-MERGE (i8:Item {uri: 'dating:body-type:petite'})
-  ON CREATE SET i8.prefLabel = ['Petite@en']
-MERGE (i8)-[:P31]->(c);
+UNWIND ['Slim', 'Athletic', 'Average', 'Curvy', 'Muscular', 'Stocky', 'Heavyset'] AS label
+MERGE (i:Item {uri: 'dating:body-type:' + toLower(label)})
+  ON CREATE SET i.prefLabel = [label + '@en']
+MERGE (i)-[:P31]->(c);
 
 // ============================================================
 // ETHNICITY (Wikidata items + custom)
@@ -533,19 +709,41 @@ MERGE (i:Item {uri: 'dating:ethnicity:' + replace(replace(toLower(label), ' ', '
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// RELATIONSHIP STATUS (custom items)
+// RELATIONSHIP STATUS (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:relationship-status'})
-UNWIND ['Single', 'Divorced', 'Separated', 'Widowed', 'In a Relationship', 'Its Complicated', 'Open Relationship'] AS label
-MERGE (i:Item {uri: 'dating:relationship:' + replace(toLower(label), ' ', '-')})
-  ON CREATE SET i.prefLabel = [label + '@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q2089826',  // single person
+  'http://www.wikidata.org/entity/Q880922',   // divorced
+  'http://www.wikidata.org/entity/Q1144222',  // legally separated
+  'http://www.wikidata.org/entity/Q745848',   // widowed
+  'http://www.wikidata.org/entity/Q203249',   // open relationship
+  'http://www.wikidata.org/entity/Q184211'    // romantic relationship (in a relationship)
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom relationship status items
+MATCH (c:Category {uri: 'dating:category:relationship-status'})
+MERGE (i:Item {uri: 'dating:relationship:its-complicated'})
+  ON CREATE SET i.prefLabel = ['Its Complicated@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// LOOKING FOR (custom items)
+// LOOKING FOR (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:looking-for'})
-UNWIND ['Friendship', 'Dating', 'Long-term Relationship', 'Marriage', 'Casual', 'Networking', 'Not Sure Yet'] AS label
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q491',      // friendship
+  'http://www.wikidata.org/entity/Q183150',   // dating
+  'http://www.wikidata.org/entity/Q8445',     // marriage
+  'http://www.wikidata.org/entity/Q895513',   // casual relationship
+  'http://www.wikidata.org/entity/Q192581'    // professional networking
+]
+MERGE (i)-[:P31]->(c);
+
+// Custom looking-for items
+MATCH (c:Category {uri: 'dating:category:looking-for'})
+UNWIND ['Long-term Relationship', 'Not Sure Yet'] AS label
 MERGE (i:Item {uri: 'dating:looking-for:' + replace(toLower(label), ' ', '-')})
   ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
@@ -687,92 +885,63 @@ MERGE (i:Item {uri: 'dating:orientation:' + toLower(label)})
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// SMOKING
+// SMOKING (Wikidata items + custom)
 // ============================================================
 MATCH (c:Category {uri: 'dating:category:smoking'})
-MERGE (i:Item {uri: 'dating:smoking:never'})
-  ON CREATE SET i.prefLabel = ['Never smokes@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q12192262', // non-smoker
+  'http://www.wikidata.org/entity/Q2196981',  // smoker
+  'http://www.wikidata.org/entity/Q2489732',  // smoking cessation (trying to quit)
+  'http://www.wikidata.org/entity/Q185157'    // vaping
+]
 MERGE (i)-[:P31]->(c);
 
+// Custom smoking items
 MATCH (c:Category {uri: 'dating:category:smoking'})
 MERGE (i:Item {uri: 'dating:smoking:socially'})
   ON CREATE SET i.prefLabel = ['Smokes socially@en']
 MERGE (i)-[:P31]->(c);
 
-MATCH (c:Category {uri: 'dating:category:smoking'})
-MERGE (i:Item {uri: 'dating:smoking:regularly'})
-  ON CREATE SET i.prefLabel = ['Smokes regularly@en']
+// ============================================================
+// DRINKING (Wikidata items + custom)
+// ============================================================
+MATCH (c:Category {uri: 'dating:category:drinking'})
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q15026091', // teetotalism (never drinks)
+  'http://www.wikidata.org/entity/Q10829696', // social drinker
+  'http://www.wikidata.org/entity/Q388614'    // sobriety
+]
 MERGE (i)-[:P31]->(c);
 
-MATCH (c:Category {uri: 'dating:category:smoking'})
-MERGE (i:Item {uri: 'dating:smoking:trying-to-quit'})
-  ON CREATE SET i.prefLabel = ['Trying to quit@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:smoking'})
-MERGE (i:Item {uri: 'dating:smoking:vapes'})
-  ON CREATE SET i.prefLabel = ['Vapes@en']
+// Custom drinking items
+MATCH (c:Category {uri: 'dating:category:drinking'})
+UNWIND ['Drinks regularly', 'Rarely drinks'] AS label
+MERGE (i:Item {uri: 'dating:drinking:' + replace(toLower(label), ' ', '-')})
+  ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// DRINKING
+// CHILDREN (Wikidata concepts + custom phrasings)
 // ============================================================
-MATCH (c:Category {uri: 'dating:category:drinking'})
-MERGE (i:Item {uri: 'dating:drinking:never'})
-  ON CREATE SET i.prefLabel = ['Never drinks@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:drinking'})
-MERGE (i:Item {uri: 'dating:drinking:socially'})
-  ON CREATE SET i.prefLabel = ['Drinks socially@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:drinking'})
-MERGE (i:Item {uri: 'dating:drinking:regularly'})
-  ON CREATE SET i.prefLabel = ['Drinks regularly@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:drinking'})
-MERGE (i:Item {uri: 'dating:drinking:rarely'})
-  ON CREATE SET i.prefLabel = ['Rarely drinks@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:drinking'})
-MERGE (i:Item {uri: 'dating:drinking:sober'})
-  ON CREATE SET i.prefLabel = ['Sober@en']
-MERGE (i)-[:P31]->(c);
-
-// ============================================================
-// CHILDREN
-// ============================================================
+// Wikidata has concepts but dating app phrasings are specific
 MATCH (c:Category {uri: 'dating:category:children'})
-MERGE (i:Item {uri: 'dating:children:no-dont-want'})
-  ON CREATE SET i.prefLabel = ['No kids, don\'t want any@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q170477',   // childfree (no kids, don't want)
+  'http://www.wikidata.org/entity/Q7566'      // parent (has kids)
+]
 MERGE (i)-[:P31]->(c);
 
+// Custom children items (compound dating-specific phrasings)
 MATCH (c:Category {uri: 'dating:category:children'})
-MERGE (i:Item {uri: 'dating:children:no-want-someday'})
-  ON CREATE SET i.prefLabel = ['No kids, want someday@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:children'})
-MERGE (i:Item {uri: 'dating:children:no-open'})
-  ON CREATE SET i.prefLabel = ['No kids, open to it@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:children'})
-MERGE (i:Item {uri: 'dating:children:yes-want-more'})
-  ON CREATE SET i.prefLabel = ['Have kids, want more@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:children'})
-MERGE (i:Item {uri: 'dating:children:yes-no-more'})
-  ON CREATE SET i.prefLabel = ['Have kids, don\'t want more@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:children'})
-MERGE (i:Item {uri: 'dating:children:yes-open'})
-  ON CREATE SET i.prefLabel = ['Have kids, open to more@en']
+UNWIND [
+  {uri: 'dating:children:no-want-someday', label: 'No kids, want someday'},
+  {uri: 'dating:children:no-open', label: 'No kids, open to it'},
+  {uri: 'dating:children:yes-want-more', label: 'Have kids, want more'},
+  {uri: 'dating:children:yes-no-more', label: 'Have kids, don\'t want more'},
+  {uri: 'dating:children:yes-open', label: 'Have kids, open to more'}
+] AS item
+MERGE (i:Item {uri: item.uri})
+  ON CREATE SET i.prefLabel = [item.label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
@@ -823,174 +992,63 @@ MATCH (i:Item) WHERE i.uri IN [
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// HOUSEHOLD PREFERENCES (custom items)
+// HOUSEHOLD PREFERENCES (Wikidata items + custom)
 // ============================================================
-
-// Temperature
+// Wikidata concepts for some household preferences
 MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:temp-cold'})
-  ON CREATE SET i.prefLabel = ['Keep it cold (below 68°F/20°C)@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q131123',   // minimalism (lifestyle)
+  'http://www.wikidata.org/entity/Q725864',   // telecommuting (work from home)
+  'http://www.wikidata.org/entity/Q160649'    // hygge/cozy
+]
 MERGE (i)-[:P31]->(c);
 
+// Custom household items (subjective preferences)
 MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:temp-moderate'})
-  ON CREATE SET i.prefLabel = ['Moderate temperature (68-72°F/20-22°C)@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:temp-warm'})
-  ON CREATE SET i.prefLabel = ['Keep it warm (above 72°F/22°C)@en']
-MERGE (i)-[:P31]->(c);
-
-// Cleanliness
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:very-tidy'})
-  ON CREATE SET i.prefLabel = ['Very tidy - everything in its place@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:mostly-tidy'})
-  ON CREATE SET i.prefLabel = ['Mostly tidy - clean but lived-in@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:relaxed-mess'})
-  ON CREATE SET i.prefLabel = ['Relaxed about mess@en']
-MERGE (i)-[:P31]->(c);
-
-// Dishes
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:dishes-immediately'})
-  ON CREATE SET i.prefLabel = ['Dishes done immediately@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:dishes-same-day'})
-  ON CREATE SET i.prefLabel = ['Dishes done same day@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:dishes-when-needed'})
-  ON CREATE SET i.prefLabel = ['Dishes done when needed@en']
-MERGE (i)-[:P31]->(c);
-
-// Noise level
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:quiet-home'})
-  ON CREATE SET i.prefLabel = ['Prefer a quiet home@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:background-noise'})
-  ON CREATE SET i.prefLabel = ['Like background music/TV@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:lively-home'})
-  ON CREATE SET i.prefLabel = ['Like a lively, active home@en']
-MERGE (i)-[:P31]->(c);
-
-// Guests
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:love-hosting'})
-  ON CREATE SET i.prefLabel = ['Love hosting guests@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:occasional-guests'})
-  ON CREATE SET i.prefLabel = ['Occasional guests are fine@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:prefer-privacy'})
-  ON CREATE SET i.prefLabel = ['Prefer privacy, few guests@en']
-MERGE (i)-[:P31]->(c);
-
-// Cooking
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:cook-daily'})
-  ON CREATE SET i.prefLabel = ['Cook most meals at home@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:cook-sometimes'})
-  ON CREATE SET i.prefLabel = ['Cook sometimes, eat out sometimes@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:mostly-takeout'})
-  ON CREATE SET i.prefLabel = ['Mostly takeout/delivery@en']
-MERGE (i)-[:P31]->(c);
-
-// Decorating style
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:minimalist'})
-  ON CREATE SET i.prefLabel = ['Minimalist style@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:cozy'})
-  ON CREATE SET i.prefLabel = ['Cozy and comfortable@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:eclectic'})
-  ON CREATE SET i.prefLabel = ['Eclectic/collected style@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:modern'})
-  ON CREATE SET i.prefLabel = ['Modern/contemporary@en']
-MERGE (i)-[:P31]->(c);
-
-// Work from home
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:wfh-always'})
-  ON CREATE SET i.prefLabel = ['Work from home full-time@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:wfh-hybrid'})
-  ON CREATE SET i.prefLabel = ['Hybrid - some days at home@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:household'})
-MERGE (i:Item {uri: 'dating:household:wfh-never'})
-  ON CREATE SET i.prefLabel = ['Work outside the home@en']
+UNWIND [
+  {uri: 'dating:household:temp-cold', label: 'Keep it cold (below 68°F/20°C)'},
+  {uri: 'dating:household:temp-moderate', label: 'Moderate temperature (68-72°F/20-22°C)'},
+  {uri: 'dating:household:temp-warm', label: 'Keep it warm (above 72°F/22°C)'},
+  {uri: 'dating:household:very-tidy', label: 'Very tidy - everything in its place'},
+  {uri: 'dating:household:mostly-tidy', label: 'Mostly tidy - clean but lived-in'},
+  {uri: 'dating:household:relaxed-mess', label: 'Relaxed about mess'},
+  {uri: 'dating:household:dishes-immediately', label: 'Dishes done immediately'},
+  {uri: 'dating:household:dishes-same-day', label: 'Dishes done same day'},
+  {uri: 'dating:household:dishes-when-needed', label: 'Dishes done when needed'},
+  {uri: 'dating:household:quiet-home', label: 'Prefer a quiet home'},
+  {uri: 'dating:household:background-noise', label: 'Like background music/TV'},
+  {uri: 'dating:household:lively-home', label: 'Like a lively, active home'},
+  {uri: 'dating:household:love-hosting', label: 'Love hosting guests'},
+  {uri: 'dating:household:occasional-guests', label: 'Occasional guests are fine'},
+  {uri: 'dating:household:prefer-privacy', label: 'Prefer privacy, few guests'},
+  {uri: 'dating:household:cook-daily', label: 'Cook most meals at home'},
+  {uri: 'dating:household:cook-sometimes', label: 'Cook sometimes, eat out sometimes'},
+  {uri: 'dating:household:mostly-takeout', label: 'Mostly takeout/delivery'},
+  {uri: 'dating:household:eclectic', label: 'Eclectic/collected style'},
+  {uri: 'dating:household:modern', label: 'Modern/contemporary'},
+  {uri: 'dating:household:wfh-always', label: 'Work from home full-time'},
+  {uri: 'dating:household:wfh-hybrid', label: 'Hybrid - some days at home'},
+  {uri: 'dating:household:wfh-never', label: 'Work outside the home'}
+] AS item
+MERGE (i:Item {uri: item.uri})
+  ON CREATE SET i.prefLabel = [item.label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
-// SLEEP SCHEDULE (custom items)
+// SLEEP SCHEDULE (Wikidata items + custom)
 // ============================================================
-
 MATCH (c:Category {uri: 'dating:category:sleep'})
-MERGE (i:Item {uri: 'dating:sleep:early-bird'})
-  ON CREATE SET i.prefLabel = ['Early bird (up before 7am)@en']
+MATCH (i:Item) WHERE i.uri IN [
+  'http://www.wikidata.org/entity/Q1366887',  // morning person (early bird)
+  'http://www.wikidata.org/entity/Q1366888'   // night owl
+]
 MERGE (i)-[:P31]->(c);
 
+// Custom sleep items
 MATCH (c:Category {uri: 'dating:category:sleep'})
-MERGE (i:Item {uri: 'dating:sleep:moderate'})
-  ON CREATE SET i.prefLabel = ['Moderate (7am-9am)@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:sleep'})
-MERGE (i:Item {uri: 'dating:sleep:night-owl'})
-  ON CREATE SET i.prefLabel = ['Night owl (up late, sleep in)@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:sleep'})
-MERGE (i:Item {uri: 'dating:sleep:flexible'})
-  ON CREATE SET i.prefLabel = ['Flexible schedule@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:sleep'})
-MERGE (i:Item {uri: 'dating:sleep:needs-quiet'})
-  ON CREATE SET i.prefLabel = ['Light sleeper - need quiet@en']
-MERGE (i)-[:P31]->(c);
-
-MATCH (c:Category {uri: 'dating:category:sleep'})
-MERGE (i:Item {uri: 'dating:sleep:sleep-anywhere'})
-  ON CREATE SET i.prefLabel = ['Can sleep through anything@en']
+UNWIND ['Moderate (7am-9am)', 'Flexible schedule', 'Light sleeper - need quiet', 'Can sleep through anything'] AS label
+MERGE (i:Item {uri: 'dating:sleep:' + replace(replace(replace(toLower(label), ' ', '-'), '(', ''), ')', '')})
+  ON CREATE SET i.prefLabel = [label + '@en']
 MERGE (i)-[:P31]->(c);
 
 // ============================================================
