@@ -24,6 +24,7 @@ const RDFS_LABEL = 'http://www.w3.org/2000/01/rdf-schema#label';
 const P31 = `<${WDT}P31>`;
 const P279 = `<${WDT}P279>`;
 
+// Instance types to always keep (small bounded sets)
 const KEEP_INSTANCE_TYPES = new Set([
   // Geographic (original - needed for location features)
   `<${WD}Q515>`,      // city
@@ -46,7 +47,6 @@ const KEEP_INSTANCE_TYPES = new Set([
   // === DATING PROFILE SPECIFIC (small bounded sets) ===
 
   // Zodiac signs (~12 items)
-  `<${WD}Q1047539>`,  // astrological sign
   `<${WD}Q192880>`,   // western astrological sign
 
   // MBTI types (~16 items)
@@ -55,7 +55,7 @@ const KEEP_INSTANCE_TYPES = new Set([
   // Attachment styles (~4 items)
   `<${WD}Q7988703>`,  // attachment style
 
-  // Gender identity (~10 items)
+  // Gender identity (~15 items)
   `<${WD}Q48264>`,    // gender identity
 
   // Sexual orientation (~10 items)
@@ -67,18 +67,23 @@ const KEEP_INSTANCE_TYPES = new Set([
   // Eye color (~8 items)
   `<${WD}Q17122705>`, // human eye color
 
-  // Marital/relationship status (~7 items)
+  // Marital status (~7 items)
   `<${WD}Q3882219>`,  // marital status
 
-  // Academic degrees (~10 items)
-  `<${WD}Q189533>`,   // academic degree
+  // Diet types (~15 items)
+  `<${WD}Q179122>`,   // diet
+]);
 
-  // Religions (~20 items) - major world religions
-  `<${WD}Q9174>`,     // religion
-  `<${WD}Q13414953>`, // religious denomination
-
-  // Diet types (~10 items)
-  `<${WD}Q179122>`,   // diet (nutrition)
+// Instance types to keep ONLY IF they are also classes (have subclasses)
+// This filters out leaf nodes like "First Baptist Church of Springfield"
+// but keeps "Christianity" (which has subclasses like Catholicism)
+const KEEP_INSTANCE_TYPES_IF_CLASS = new Set([
+  `<${WD}Q9174>`,     // religion - keep major religions that have subdenominations
+  `<${WD}Q13414953>`, // religious denomination - keep major denominations
+  `<${WD}Q189533>`,   // academic degree - keep major degree types
+  `<${WD}Q11862829>`, // academic discipline - keep fields of study
+  `<${WD}Q28640>`,    // profession - keep job categories
+  `<${WD}Q12737077>`, // occupation - keep job categories
 ]);
 
 const startTime = Date.now();
@@ -217,13 +222,17 @@ async function main(inputFile, baseDir) {
   process.stderr.write(`[${elapsed()}] Pass 1: Building entity index in ${baseDir}\n`);
   let classCount = 0;
   let instanceCount = 0;
+  let conditionalInstanceCount = 0;
   let propertyCount = 0;
   let totalLines = 0;
   const propertiesToKeep = new Set();
 
+  // Track instances of KEEP_INSTANCE_TYPES_IF_CLASS - will filter after pass 1
+  const conditionalInstances = new Set();
+
   await processFile(inputFile, baseDir, 1, {
     status(lineCount, pct) {
-      process.stderr.write(`  [${pct}% ${elapsed()}/${eta(pct)}] ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertiesToKeep.size.toLocaleString()} properties\n`);
+      process.stderr.write(`  [${pct}% ${elapsed()}/${eta(pct)}] ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${conditionalInstances.size.toLocaleString()} conditional\n`);
     },
     process({ subj, pred, obj }) {
       // Track properties used
@@ -242,6 +251,9 @@ async function main(inputFile, baseDir) {
         if (KEEP_INSTANCE_TYPES.has(obj)) {
           markEntity(baseDir, subj);
           instanceCount++;
+        } else if (KEEP_INSTANCE_TYPES_IF_CLASS.has(obj)) {
+          // Don't mark yet - collect for filtering after we know all classes
+          conditionalInstances.add(subj);
         }
       }
     },
@@ -258,9 +270,22 @@ async function main(inputFile, baseDir) {
           propertyCount++;
         }
       }
+
+      // Filter conditional instances: only keep those that are also classes
+      // (i.e., already marked via P279 relationships)
+      process.stderr.write(`[${elapsed()}] Filtering ${conditionalInstances.size.toLocaleString()} conditional instances...\n`);
+      for (const subj of conditionalInstances) {
+        if (hasEntity(baseDir, subj)) {
+          // Already a class, count it as a conditional instance kept
+          conditionalInstanceCount++;
+        }
+        // If not already marked as class, don't mark it - filters out leaf instances
+      }
+      process.stderr.write(`[${elapsed()}] Kept ${conditionalInstanceCount.toLocaleString()} conditional instances (are also classes)\n`);
+
       // Save for pass 2 percentage
       totalLines = lineCount;
-      process.stderr.write(`[${elapsed()}] Pass 1 complete: ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${propertyCount.toLocaleString()} properties\n`);
+      process.stderr.write(`[${elapsed()}] Pass 1 complete: ${lineCount.toLocaleString()} lines, ${classCount.toLocaleString()} classes, ${instanceCount.toLocaleString()} instances, ${conditionalInstanceCount.toLocaleString()} conditional, ${propertyCount.toLocaleString()} properties\n`);
     }
   });
 
